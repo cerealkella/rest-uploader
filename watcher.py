@@ -20,6 +20,9 @@ https://stackoverflow.com/questions/18599339/python-watchdog-monitoring-file-for
 The Joplin Webclipper API seems to only support image file uploads,
 Unfortunately, PDFs do not work.
 Plain text files work -- tested with .md and .txt extensions.
+
+Caveat
+Uploader only triggered upon new file creation, not modification
 '''
 
 

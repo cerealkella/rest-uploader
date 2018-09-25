@@ -1,0 +1,3 @@
+watchdog
+requests
+python-magic-bin==0.4.14
