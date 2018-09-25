@@ -4,6 +4,7 @@ import platform
 import time
 import base64
 import magic
+import json
 from requests import post
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -16,10 +17,9 @@ PATH variable to Joplin. The following resource was helpful in figuring out
 the logic for Watchdog:
 https://stackoverflow.com/questions/18599339/python-watchdog-monitoring-file-for-changes
 
-The API seems to only support image file uploads, PDFs do not work.
-I'd like to build out fully functional support for .md and .txt files
-but I don't presently have time to fix the issue with the API and handling
-of quotes and double-quotes
+The Joplin Webclipper API seems to only support image file uploads,
+Unfortunately, PDFs do not work.
+Plain text files work -- tested with .md and .txt extensions.
 '''
 
 
@@ -57,8 +57,8 @@ def upload(filename):
         # will bomb if there are quotes in the text file
         body = read_text_note(filename)
         print(body)
-        values = '{{ "title": "{}", "body": "{}" }}'\
-            .format(title, repr(body).replace("'", ""))
+        values = '{{ "title": "{}", "body": {} }}'\
+            .format(title, json.dumps(body))
         print(values)
         print(repr(values))
     else:
