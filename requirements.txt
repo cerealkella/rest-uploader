@@ -1,2 +1,4 @@
 watchdog
 requests
+pytesseract
+pdf2image

@@ -8,7 +8,7 @@ import json
 from requests import post
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-
+from img_process import extract_text_from_image
 
 '''
 2018-09-24 JRK
@@ -66,8 +66,10 @@ def upload(filename):
         print(repr(values))
     else:
         body = filename + " uploaded from " + platform.node()
-        values = '{{ "title": "{}", "body": "{}", "image_data_url": "{}" }}'\
-            .format(title, body, img)
+        body += "\n"
+        body += extract_text_from_image(filename)
+        values = '{{ "title": "{}", "body": {}, "image_data_url": "{}" }}'\
+            .format(title, json.dumps(body), img)
     response = post(SERVER, data=values)
     print(response)
     print(response.text)
