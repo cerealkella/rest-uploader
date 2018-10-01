@@ -2,3 +2,4 @@ watchdog
 requests
 pytesseract
 pdf2image
+PyPDF2
