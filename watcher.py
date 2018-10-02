@@ -63,6 +63,7 @@ def create_resource(filename):
                                                                    basefile))
     }
     response = requests.post(SERVER + '/resources' + TOKEN, files=files)
+    print(response.json())
     return response.json()
 
 
@@ -108,17 +109,18 @@ def upload(filename):
         values = set_json_string(title, body, img)
     else:
         response = create_resource(filename)
-        body += '[](:{})'.format(response['id'])
+        body += '[](:/{})'.format(response['id'])
+        values = set_json_string(title, body)
         if response['file_extension'] == 'pdf':
             # Special handling for PDFs
             body += extract_text_from_pdf(filename)
             previewfile = pdf_page_to_image(filename)
+            img = encode_image(previewfile, "image/png")
             print(len(body))
             if len(body) <= 100:
                 # if embedded PDF text is minimal or does not exist,
                 # run OCR the preview file
                 body += extract_text_from_image(previewfile)
-            img = encode_image(previewfile, "image/png")
             values = set_json_string(title, body, img)
 
     response = requests.post(SERVER + '/notes' + TOKEN, data=values)
