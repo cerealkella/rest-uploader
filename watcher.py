@@ -40,9 +40,16 @@ class MyHandler(FileSystemEventHandler):
         print(event.event_type + " -- " + event.src_path)
         filename, ext = os.path.splitext(event.src_path)
         if ext != '.tmp':
-            upload(event.src_path)
+            for i in range(10):
+                if os.path.getsize(event.src_path) < 1:
+                    if i == 9:
+                        print("timeout error, file zero bytes")
+                        return
+                    time.sleep(5)
+                else:
+                    upload(event.src_path)
         else:
-            print("Temp files are ignored.")
+            print("Detected temp file. Temp files are ignored.")
 
 
 # Set working Directory
