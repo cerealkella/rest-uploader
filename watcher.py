@@ -38,7 +38,11 @@ TOKEN = get_token_suffix()
 class MyHandler(FileSystemEventHandler):
     def on_created(self, event):
         print(event.event_type + " -- " + event.src_path)
-        upload(event.src_path)
+        filename, ext = os.path.splitext(event.src_path)
+        if ext != '.tmp':
+            upload(event.src_path)
+        else:
+            print("Temp files are ignored.")
 
 
 # Set working Directory
