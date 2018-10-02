@@ -5,10 +5,13 @@ import time
 import base64
 import magic
 import json
-from requests import post
+import requests
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from img_process import extract_text_from_image
+from img_process import extract_text_from_image, extract_text_from_pdf,\
+                        pdf_page_to_image
+from settings import PATH, SERVER
+from api_token import get_token_suffix
 
 '''
 2018-09-24 JRK
@@ -17,17 +20,19 @@ PATH variable to Joplin. The following resource was helpful in figuring out
 the logic for Watchdog:
 https://stackoverflow.com/questions/18599339/python-watchdog-monitoring-file-for-changes
 
-The Joplin Webclipper API seems to only support image file uploads,
-Unfortunately, PDFs do not work.
-Plain text files work -- tested with .md and .txt extensions.
+Tested with the following extensions:
+.md
+.txt
+.pdf
+.png
+.jpg
 
 Caveat
 Uploader only triggered upon new file creation, not modification
 '''
 
 
-SERVER = 'http://127.0.0.1:41184/notes'
-PATH = './upload/'
+TOKEN = get_token_suffix()
 
 
 class MyHandler(FileSystemEventHandler):
@@ -49,28 +54,74 @@ def read_text_note(filename):
     return text
 
 
-def upload(filename):
-    mime = magic.Magic(mime=True)
-    datatype = mime.from_file(filename)
+def create_resource(filename):
+    basefile = os.path.basename(filename)
+    title = os.path.splitext(basefile)[0]
+    files = {
+        'data': (json.dumps(filename), open(filename, 'rb')),
+        'props': (None, '{{"title":"{}", "filename":"{}"}}'.format(title,
+                                                                   basefile))
+    }
+    response = requests.post(SERVER + '/resources' + TOKEN, files=files)
+    return response.json()
+
+
+def delete_resource(resource_id):
+    apitext = SERVER + '/resources/' + resource_id + TOKEN
+    response = requests.delete(apitext)
+    return response
+
+
+def get_resource(resource_id):
+    apitext = SERVER + '/resources/' + resource_id + TOKEN
+    response = requests.get(apitext)
+    return response
+
+
+def encode_image(filename, datatype):
     encoded = base64.b64encode(open(filename, "rb").read())
     img = "data:{};base64,{}".format(datatype, encoded.decode())
-    title = os.path.basename(filename)
-    if datatype == "text/plain":
-        # this is not working correctly yet
-        # will bomb if there are quotes in the text file
-        body = read_text_note(filename)
-        print(body)
-        values = '{{ "title": "{}", "body": {} }}'\
-            .format(title, json.dumps(body))
-        print(values)
-        print(repr(values))
+    return img
+
+
+def set_json_string(title, body, img=None):
+    if img is None:
+        return '{{ "title": {}, "body": {} }}'\
+            .format(json.dumps(title), json.dumps(body))
     else:
-        body = filename + " uploaded from " + platform.node()
-        body += "\n"
-        body += extract_text_from_image(filename)
-        values = '{{ "title": "{}", "body": {}, "image_data_url": "{}" }}'\
+        return '{{ "title": "{}", "body": {}, "image_data_url": "{}" }}'\
             .format(title, json.dumps(body), img)
-    response = post(SERVER, data=values)
+
+
+def upload(filename):
+    basefile = os.path.basename(filename)
+    title = os.path.splitext(basefile)[0]
+    body = basefile + " uploaded from " + platform.node() + "\n"
+    mime = magic.Magic(mime=True)
+    datatype = mime.from_file(filename)
+    if datatype == "text/plain":
+        body += read_text_note(filename)
+        values = set_json_string(title, body)
+    elif datatype[:5] == "image":
+        img = encode_image(filename, datatype)
+        body += extract_text_from_image(filename)
+        values = set_json_string(title, body, img)
+    else:
+        response = create_resource(filename)
+        body += '[](:{})'.format(response['id'])
+        if response['file_extension'] == 'pdf':
+            # Special handling for PDFs
+            body += extract_text_from_pdf(filename)
+            previewfile = pdf_page_to_image(filename)
+            print(len(body))
+            if len(body) <= 100:
+                # if embedded PDF text is minimal or does not exist,
+                # run OCR the preview file
+                body += extract_text_from_image(previewfile)
+            img = encode_image(previewfile, "image/png")
+            values = set_json_string(title, body, img)
+
+    response = requests.post(SERVER + '/notes' + TOKEN, data=values)
     print(response)
     print(response.text)
     print(response.json())
