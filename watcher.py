@@ -44,10 +44,11 @@ class MyHandler(FileSystemEventHandler):
                 if os.path.getsize(event.src_path) < 1:
                     if i == 9:
                         print("timeout error, file zero bytes")
-                        return
+                        return False
                     time.sleep(5)
                 else:
                     upload(event.src_path)
+                    return True
         else:
             print("Detected temp file. Temp files are ignored.")
 

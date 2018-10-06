@@ -4,3 +4,4 @@ PyPDF2
 pytesseract
 pdf2image
 python-magic-bin==0.4.14
+unidecode

@@ -1,11 +1,14 @@
 # rest-uploader
 REST API File Uploader
 
+[API Reference](https://joplin.cozic.net/api/)
+
 ## Note: run pip install windows-requirements on Windows platforms
 
 Joplin client will need Webclipper service enabled.
-Go to Tools -> Web Clipper Options -> Enable Web Clipper Service
-Copy your API token to this directory and call it ".api_token.txt"
+* Go to Tools -> Web Clipper Options -> Enable Web Clipper Service
+* Copy your API token to this directory and call it ".api_token.txt"
+
 
 ## Windows users
 ### Tesseract
