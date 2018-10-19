@@ -15,7 +15,7 @@ def pdf_valid(filename):
     try:
         pdfReader = PyPDF2.PdfFileReader(pdfFileObject)
         return True
-    except PyPDF2.PdfReadError:
+    except PyPDF2.utils.PdfReadError:
         print("PDF not fully written")
         return False
 
