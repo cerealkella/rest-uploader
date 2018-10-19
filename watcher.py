@@ -42,6 +42,7 @@ class MyHandler(FileSystemEventHandler):
         if ext != '.tmp':
             for i in range(10):
                 if os.path.getsize(event.src_path) < 1 or (ext == '.pdf' and not pdf_valid(event.src_path)):
+                    print("Incomplete file. Retrying...")
                     if i == 9:
                         print("timeout error, invalid file")
                         return False
