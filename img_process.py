@@ -10,6 +10,16 @@ from settings import TEMP_PATH
 # sys.stdout = open('output.md', 'wt')
 
 
+def pdf_valid(filename):
+    pdfFileObject = open(filename, 'rb')
+    try:
+        pdfReader = PyPDF2.PdfFileReader(pdfFileObject)
+        return True
+    except PdfReadError:
+        print("PDF not fully written")
+        return False
+
+
 def pdf_page_to_image(filename):
     pages = convert_from_path(filename, 250)
     tempfile = TEMP_PATH + "pdfpreview.png"

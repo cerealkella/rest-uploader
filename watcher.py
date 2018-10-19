@@ -9,7 +9,7 @@ import requests
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from img_process import extract_text_from_image, extract_text_from_pdf,\
-                        pdf_page_to_image
+                        pdf_page_to_image, pdf_valid
 from settings import PATH, SERVER
 from api_token import get_token_suffix
 
@@ -41,9 +41,9 @@ class MyHandler(FileSystemEventHandler):
         filename, ext = os.path.splitext(event.src_path)
         if ext != '.tmp':
             for i in range(10):
-                if os.path.getsize(event.src_path) < 1:
+                if os.path.getsize(event.src_path) < 1 or (ext == '.pdf' and not pdf_valid(event.src_path)):
                     if i == 9:
-                        print("timeout error, file zero bytes")
+                        print("timeout error, invalid file")
                         return False
                     time.sleep(5)
                 else:
