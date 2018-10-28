@@ -2,8 +2,8 @@ import os
 import requests
 from json import dumps
 from api_token import get_token_suffix
-from settings import SERVER, PATH
-
+from settings import SERVER, PATH, JOPLIN_NOTEBOOK
+from watcher import get_notebook_id
 
 TOKEN = get_token_suffix()
 
@@ -40,3 +40,4 @@ print(get_resource(resp['id']))
 print(delete_resource(resp['id']))
 print(get_resource(resp['id']))
 '''
+print(get_notebook_id())

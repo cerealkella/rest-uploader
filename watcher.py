@@ -10,7 +10,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from img_process import extract_text_from_image, extract_text_from_pdf,\
                         pdf_page_to_image, pdf_valid
-from settings import PATH, SERVER
+from settings import PATH, SERVER, JOPLIN_NOTEBOOK
 from api_token import get_token_suffix
 
 '''
@@ -67,6 +67,26 @@ def read_text_note(filename):
     return text
 
 
+def get_notebook_id():
+    # Find the ID of the destination folder
+    # adapted logic from jhf2442 on Joplin forum
+    # https://discourse.joplin.cozic.net/t/import-txt-files/692
+    res = requests.get(SERVER + "/folders" + TOKEN)
+    folders = res.json()
+
+    notebook_id = 0
+    for folder in folders:
+        if folder.get('title') == JOPLIN_NOTEBOOK:
+            notebook_id = folder.get('id')
+    if notebook_id == 0:
+        for folder in folders:
+            if 'children' in folder:
+                for child in folder.get('children'):
+                    if child.get('title') == JOPLIN_NOTEBOOOK:
+                        notebook_id = child.get('id')
+    return notebook_id
+
+
 def create_resource(filename):
     basefile = os.path.basename(filename)
     title = os.path.splitext(basefile)[0]
@@ -98,13 +118,13 @@ def encode_image(filename, datatype):
     return img
 
 
-def set_json_string(title, body, img=None):
+def set_json_string(title, notebook_id, body, img=None):
     if img is None:
-        return '{{ "title": {}, "body": {} }}'\
-            .format(json.dumps(title), json.dumps(body))
+        return '{{ "title": {}, "parent_id": "{}", "body": {} }}'\
+            .format(json.dumps(title), notebook_id, json.dumps(body))
     else:
-        return '{{ "title": "{}", "body": {}, "image_data_url": "{}" }}'\
-            .format(title, json.dumps(body), img)
+        return '{{ "title": "{}", "parent_id": "{}", "body": {}, "image_data_url": "{}" }}'\
+            .format(title, notebook_id, json.dumps(body), img)
 
 
 def upload(filename):
@@ -113,17 +133,18 @@ def upload(filename):
     body = basefile + " uploaded from " + platform.node() + "\n"
     mime = magic.Magic(mime=True)
     datatype = mime.from_file(filename)
+    notebook_id = get_notebook_id()
     if datatype == "text/plain":
         body += read_text_note(filename)
-        values = set_json_string(title, body)
+        values = set_json_string(title, notebook_id, body)
     elif datatype[:5] == "image":
         img = encode_image(filename, datatype)
         body += extract_text_from_image(filename)
-        values = set_json_string(title, body, img)
+        values = set_json_string(title, notebook_id, body, img)
     else:
         response = create_resource(filename)
         body += '[](:/{})'.format(response['id'])
-        values = set_json_string(title, body)
+        values = set_json_string(title, notebook_id, body)
         if response['file_extension'] == 'pdf':
             # Special handling for PDFs
             body += extract_text_from_pdf(filename)
@@ -134,7 +155,7 @@ def upload(filename):
                 # if embedded PDF text is minimal or does not exist,
                 # run OCR the preview file
                 body += extract_text_from_image(previewfile)
-            values = set_json_string(title, body, img)
+            values = set_json_string(title, notebook_id, body, img)
 
     response = requests.post(SERVER + '/notes' + TOKEN, data=values)
     print(response)
