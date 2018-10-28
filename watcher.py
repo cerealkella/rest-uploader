@@ -82,7 +82,7 @@ def get_notebook_id():
         for folder in folders:
             if 'children' in folder:
                 for child in folder.get('children'):
-                    if child.get('title') == JOPLIN_NOTEBOOOK:
+                    if child.get('title') == JOPLIN_NOTEBOOK:
                         notebook_id = child.get('id')
     return notebook_id
 
