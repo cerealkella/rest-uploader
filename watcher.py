@@ -39,7 +39,7 @@ class MyHandler(FileSystemEventHandler):
     def on_created(self, event):
         print(event.event_type + " -- " + event.src_path)
         filename, ext = os.path.splitext(event.src_path)
-        if ext != '.tmp':
+        if ext not in ('.tmp', '.crdownload'):
             for i in range(10):
                 if os.path.getsize(event.src_path) < 1 or (ext == '.pdf' and not pdf_valid(event.src_path)):
                     print("Incomplete file. Retrying...")
