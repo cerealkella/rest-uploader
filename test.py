@@ -32,6 +32,18 @@ def get_resource(resource_id):
     return response
 
 
+def get_folders():
+    req = requests.get(SERVER + "/folders" + TOKEN)
+    print(SERVER)
+    return req.json()
+
+
+def get_tags():
+    req = requests.get(SERVER + "/tags" + TOKEN)
+    print(SERVER)
+    return req.json()
+
+
 '''
 resp = (create_resource(PATH + "test.pdf"))
 print(resp)
@@ -40,4 +52,20 @@ print(get_resource(resp['id']))
 print(delete_resource(resp['id']))
 print(get_resource(resp['id']))
 '''
-print(get_notebook_id())
+
+SERVER = 'http://localhost:41184'
+
+# print(get_notebook_id())
+# print(get_folders())
+import base64
+
+def write_encoded():
+    encoded = base64.b64encode(open("mcconn.png", "rb").read())
+    print(type(encoded))
+    # img = "data:{};base64,{}".format(datatype, encoded.decode())
+    with open('encodedimg.txt', 'w') as f:
+        f.write(encoded.decode("utf-8"))
+
+# write_encoded()
+
+print(get_tags())

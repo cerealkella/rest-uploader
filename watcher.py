@@ -143,17 +143,18 @@ def upload(filename):
         values = set_json_string(title, notebook_id, body, img)
     else:
         response = create_resource(filename)
-        body += '[](:/{})'.format(response['id'])
+        body += '[{}](:/{})'.format(basefile, response['id'])
         values = set_json_string(title, notebook_id, body)
         if response['file_extension'] == 'pdf':
             # Special handling for PDFs
-            body += extract_text_from_pdf(filename)
+            pdf_embedded_text = extract_text_from_pdf(filename)
             previewfile = pdf_page_to_image(filename)
             img = encode_image(previewfile, "image/png")
-            print(len(body))
-            if len(body) <= 100:
-                # if embedded PDF text is minimal or does not exist,
-                # run OCR the preview file
+            # if embedded PDF text is minimal or does not exist,
+            # run OCR the preview file
+            if len(pdf_embedded_text) >= 100:
+                body += pdf_embedded_text
+            else:
                 body += extract_text_from_image(previewfile)
             values = set_json_string(title, notebook_id, body, img)
 

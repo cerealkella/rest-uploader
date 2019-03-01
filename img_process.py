@@ -7,8 +7,6 @@ from pdf2image import convert_from_path
 from pytesseract import image_to_string
 from settings import TEMP_PATH
 
-# sys.stdout = open('output.md', 'wt')
-
 
 def pdf_valid(filename):
     pdfFileObject = open(filename, 'rb')
