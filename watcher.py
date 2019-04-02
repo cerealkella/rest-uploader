@@ -36,22 +36,31 @@ TOKEN = get_token_suffix()
 
 
 class MyHandler(FileSystemEventHandler):
-    def on_created(self, event):
-        print(event.event_type + " -- " + event.src_path)
-        filename, ext = os.path.splitext(event.src_path)
-        if ext not in ('.tmp', '.crdownload'):
+    def _event_handler(self, path):
+        filename, ext = os.path.splitext(path)
+        if ext not in ('.tmp', '.crdownload') and ext[:2] not in ('.~'):
             for i in range(10):
-                if os.path.getsize(event.src_path) < 1 or (ext == '.pdf' and not pdf_valid(event.src_path)):
+                if os.path.getsize(path) < 1 or (ext == '.pdf' and not pdf_valid(path)):
                     print("Incomplete file. Retrying...")
                     if i == 9:
                         print("timeout error, invalid file")
                         return False
                     time.sleep(5)
                 else:
-                    upload(event.src_path)
+                    upload(path)
                     return True
         else:
             print("Detected temp file. Temp files are ignored.")
+
+
+    def on_created(self, event):
+        print(event.event_type + " -- " + event.src_path)
+        self._event_handler(event.src_path)
+
+
+    def on_moved(self, event):
+        print(event.event_type + " -- " + event.dest_path)
+        self._event_handler(event.dest_path)
 
 
 # Set working Directory
@@ -167,6 +176,7 @@ def upload(filename):
 if __name__ == "__main__":
     set_working_directory()
     event_handler = MyHandler()
+    print("Monitoring directory {} for files".format(PATH))
     observer = Observer()
     observer.schedule(event_handler, path=PATH, recursive=False)
     observer.start()
