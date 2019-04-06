@@ -12,22 +12,21 @@ def create_resource(filename):
     basefile = os.path.basename(filename)
     title = os.path.splitext(basefile)[0]
     files = {
-        'data': (dumps(filename), open(filename, 'rb')),
-        'props': (None, '{{"title":"{}", "filename":"{}"}}'.format(title,
-                                                                   basefile))
+        "data": (dumps(filename), open(filename, "rb")),
+        "props": (None, '{{"title":"{}", "filename":"{}"}}'.format(title, basefile)),
     }
-    response = requests.post(SERVER + '/resources' + TOKEN, files=files)
+    response = requests.post(SERVER + "/resources" + TOKEN, files=files)
     return response.json()
 
 
 def delete_resource(resource_id):
-    apitext = SERVER + '/resources/' + resource_id + TOKEN
+    apitext = SERVER + "/resources/" + resource_id + TOKEN
     response = requests.delete(apitext)
     return response
 
 
 def get_resource(resource_id):
-    apitext = SERVER + '/resources/' + resource_id + TOKEN
+    apitext = SERVER + "/resources/" + resource_id + TOKEN
     response = requests.get(apitext)
     return response
 
@@ -44,27 +43,29 @@ def get_tags():
     return req.json()
 
 
-'''
+"""
 resp = (create_resource(PATH + "test.pdf"))
 print(resp)
 print(resp['id'])
 print(get_resource(resp['id']))
 print(delete_resource(resp['id']))
 print(get_resource(resp['id']))
-'''
+"""
 
-SERVER = 'http://localhost:41184'
+SERVER = "http://localhost:41184"
 
 # print(get_notebook_id())
 # print(get_folders())
 import base64
 
+
 def write_encoded():
     encoded = base64.b64encode(open("mcconn.png", "rb").read())
     print(type(encoded))
     # img = "data:{};base64,{}".format(datatype, encoded.decode())
-    with open('encodedimg.txt', 'w') as f:
+    with open("encodedimg.txt", "w") as f:
         f.write(encoded.decode("utf-8"))
+
 
 # write_encoded()
 

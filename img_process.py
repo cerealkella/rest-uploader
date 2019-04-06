@@ -9,7 +9,7 @@ from settings import TEMP_PATH
 
 
 def pdf_valid(filename):
-    pdfFileObject = open(filename, 'rb')
+    pdfFileObject = open(filename, "rb")
     try:
         pdfReader = PyPDF2.PdfFileReader(pdfFileObject)
         return True
@@ -26,7 +26,7 @@ def pdf_page_to_image(filename):
 
 
 def extract_text_from_pdf(filename):
-    pdfFileObject = open(filename, 'rb')
+    pdfFileObject = open(filename, "rb")
     pdfReader = PyPDF2.PdfFileReader(pdfFileObject)
     count = pdfReader.numPages
     for i in range(count):

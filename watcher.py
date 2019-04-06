@@ -8,12 +8,16 @@ import json
 import requests
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from img_process import extract_text_from_image, extract_text_from_pdf,\
-                        pdf_page_to_image, pdf_valid
+from img_process import (
+    extract_text_from_image,
+    extract_text_from_pdf,
+    pdf_page_to_image,
+    pdf_valid,
+)
 from settings import PATH, SERVER, JOPLIN_NOTEBOOK
 from api_token import get_token_suffix
 
-'''
+"""
 2018-09-24 JRK
 This program was created to upload files from a folder specified in the
 PATH variable to Joplin. The following resource was helpful in figuring out
@@ -29,7 +33,7 @@ Tested with the following extensions:
 
 Caveat
 Uploader only triggered upon new file creation, not modification
-'''
+"""
 
 
 TOKEN = get_token_suffix()
@@ -38,9 +42,9 @@ TOKEN = get_token_suffix()
 class MyHandler(FileSystemEventHandler):
     def _event_handler(self, path):
         filename, ext = os.path.splitext(path)
-        if ext not in ('.tmp', '.crdownload') and ext[:2] not in ('.~'):
+        if ext not in (".tmp", ".crdownload") and ext[:2] not in (".~"):
             for i in range(10):
-                if os.path.getsize(path) < 1 or (ext == '.pdf' and not pdf_valid(path)):
+                if os.path.getsize(path) < 1 or (ext == ".pdf" and not pdf_valid(path)):
                     print("Incomplete file. Retrying...")
                     if i == 9:
                         print("timeout error, invalid file")
@@ -52,11 +56,9 @@ class MyHandler(FileSystemEventHandler):
         else:
             print("Detected temp file. Temp files are ignored.")
 
-
     def on_created(self, event):
         print(event.event_type + " -- " + event.src_path)
         self._event_handler(event.src_path)
-
 
     def on_moved(self, event):
         print(event.event_type + " -- " + event.dest_path)
@@ -70,7 +72,7 @@ def set_working_directory():
 
 
 def read_text_note(filename):
-    with open(filename, 'r') as myfile:
+    with open(filename, "r") as myfile:
         text = myfile.read()
         print(text)
     return text
@@ -85,14 +87,14 @@ def get_notebook_id():
 
     notebook_id = 0
     for folder in folders:
-        if folder.get('title') == JOPLIN_NOTEBOOK:
-            notebook_id = folder.get('id')
+        if folder.get("title") == JOPLIN_NOTEBOOK:
+            notebook_id = folder.get("id")
     if notebook_id == 0:
         for folder in folders:
-            if 'children' in folder:
-                for child in folder.get('children'):
-                    if child.get('title') == JOPLIN_NOTEBOOK:
-                        notebook_id = child.get('id')
+            if "children" in folder:
+                for child in folder.get("children"):
+                    if child.get("title") == JOPLIN_NOTEBOOK:
+                        notebook_id = child.get("id")
     return notebook_id
 
 
@@ -100,23 +102,22 @@ def create_resource(filename):
     basefile = os.path.basename(filename)
     title = os.path.splitext(basefile)[0]
     files = {
-        'data': (json.dumps(filename), open(filename, 'rb')),
-        'props': (None, '{{"title":"{}", "filename":"{}"}}'.format(title,
-                                                                   basefile))
+        "data": (json.dumps(filename), open(filename, "rb")),
+        "props": (None, '{{"title":"{}", "filename":"{}"}}'.format(title, basefile)),
     }
-    response = requests.post(SERVER + '/resources' + TOKEN, files=files)
+    response = requests.post(SERVER + "/resources" + TOKEN, files=files)
     print(response.json())
     return response.json()
 
 
 def delete_resource(resource_id):
-    apitext = SERVER + '/resources/' + resource_id + TOKEN
+    apitext = SERVER + "/resources/" + resource_id + TOKEN
     response = requests.delete(apitext)
     return response
 
 
 def get_resource(resource_id):
-    apitext = SERVER + '/resources/' + resource_id + TOKEN
+    apitext = SERVER + "/resources/" + resource_id + TOKEN
     response = requests.get(apitext)
     return response
 
@@ -129,11 +130,13 @@ def encode_image(filename, datatype):
 
 def set_json_string(title, notebook_id, body, img=None):
     if img is None:
-        return '{{ "title": {}, "parent_id": "{}", "body": {} }}'\
-            .format(json.dumps(title), notebook_id, json.dumps(body))
+        return '{{ "title": {}, "parent_id": "{}", "body": {} }}'.format(
+            json.dumps(title), notebook_id, json.dumps(body)
+        )
     else:
-        return '{{ "title": "{}", "parent_id": "{}", "body": {}, "image_data_url": "{}" }}'\
-            .format(title, notebook_id, json.dumps(body), img)
+        return '{{ "title": "{}", "parent_id": "{}", "body": {}, "image_data_url": "{}" }}'.format(
+            title, notebook_id, json.dumps(body), img
+        )
 
 
 def upload(filename):
@@ -152,9 +155,9 @@ def upload(filename):
         values = set_json_string(title, notebook_id, body, img)
     else:
         response = create_resource(filename)
-        body += '[{}](:/{})'.format(basefile, response['id'])
+        body += "[{}](:/{})".format(basefile, response["id"])
         values = set_json_string(title, notebook_id, body)
-        if response['file_extension'] == 'pdf':
+        if response["file_extension"] == "pdf":
             # Special handling for PDFs
             pdf_embedded_text = extract_text_from_pdf(filename)
             previewfile = pdf_page_to_image(filename)
@@ -167,7 +170,7 @@ def upload(filename):
                 body += extract_text_from_image(previewfile)
             values = set_json_string(title, notebook_id, body, img)
 
-    response = requests.post(SERVER + '/notes' + TOKEN, data=values)
+    response = requests.post(SERVER + "/notes" + TOKEN, data=values)
     print(response)
     print(response.text)
     print(response.json())
