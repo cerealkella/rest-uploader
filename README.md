@@ -21,3 +21,8 @@ Poppler is required for PDF processing.
 https://blog.alivate.com.au/poppler-windows/
 
 Download x86 binary and add to environment path
+
+### Running application
+Ensure the settings.py file points to the correct directory you wish to monitor.
+By default, it looks at the upload folder within the rest-uploader directory.
+Launch watcher.py and let it run in the background.
