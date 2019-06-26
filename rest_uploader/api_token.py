@@ -1,11 +1,17 @@
 import requests
+from os import path
 from .settings import SERVER
 
 
 def get_token():
-    with open(".api_token.txt", "r") as f:
-        token = f.readline().rstrip()
-        return token
+    if path.exists(".api_token.txt"):
+        with open(".api_token.txt", "r") as f:
+            token = f.readline().rstrip()
+    else:
+        token = input("Paste your Joplin API Token:")
+        with open(".api_token.txt", "w") as f:
+            f.write(token.rstrip())
+    return token
 
 
 def get_token_suffix():
