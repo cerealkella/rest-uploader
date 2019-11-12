@@ -27,9 +27,9 @@ def extract_text_from_pdf(filename):
     pdfFileObject = open(filename, "rb")
     pdfReader = PyPDF2.PdfFileReader(pdfFileObject)
     count = pdfReader.numPages
+    text = "\n<!---\n"
     for i in range(count):
         page = pdfReader.getPage(i)
-        text = "\n<!---\n"
         text += page.extractText()
         text += "\n-->\n"
     return unidecode(text)
