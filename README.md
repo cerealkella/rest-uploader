@@ -3,8 +3,6 @@ REST API File Uploader for Joplin
 
 [API Reference](https://joplin.cozic.net/api/)
 
-## Note: run pip install windows-requirements on Windows platforms
-
 Joplin client will need Webclipper service enabled.
 * Go to Tools -> Web Clipper Options -> Enable Web Clipper Service
 
