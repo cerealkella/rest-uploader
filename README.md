@@ -28,3 +28,8 @@ launch. If your API key changes or gets pasted incorrectly, delete the .api_toke
 To launch as python module:
 
 ` python -m rest_uploader.cli /path/to/directory `
+
+### Languages other than English
+Version 0.4.0 added language support via Tesseract (check Tesseract docs). To enable:
+
+` rest_uploader /path/to/directory --language ger `
