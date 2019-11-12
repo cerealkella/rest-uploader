@@ -4,6 +4,7 @@
 import sys
 import click
 from .rest_uploader import watcher
+from .img_process import set_language
 
 
 @click.command()
@@ -18,12 +19,23 @@ from .rest_uploader import watcher
         resolve_path=True,
     ),
 )
-def main(path=None):
+@click.option(
+    "-l",
+    "--language",
+    "language",
+    default="eng",
+    help="""Specify OCR Language. 
+            Refer to Tesseract's documentation found here:
+            https://github.com/tesseract-ocr/tesseract/wiki""",
+)
+def main(path=None, language="eng"):
     """ Console script for rest_uploader.
         Define file path to monitor, e.g.
         rest_uploader /home/user/Docouments/scans    
     """
     click.echo("Launching Application " "rest_uploader.cli.main")
+    set_language(language)
+    click.echo("Language: " + language)
     watcher(path=path)
     return 0
 

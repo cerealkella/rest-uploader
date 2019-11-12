@@ -17,7 +17,7 @@ from .img_process import (
     pdf_page_to_image,
     pdf_valid,
 )
-from .settings import SERVER, JOPLIN_NOTEBOOK
+from .settings import SERVER, JOPLIN_NOTEBOOK, TEMP_PATH
 from .api_token import get_token_suffix
 from pathlib import Path
 
@@ -169,7 +169,9 @@ def upload(filename):
         values = set_json_string(title, notebook_id, body)
     elif datatype[:5] == "image":
         img = encode_image(filename, datatype)
+        body += "\n<!---\n"
         body += extract_text_from_image(filename)
+        body += "\n-->\n"
         values = set_json_string(title, notebook_id, body, img)
     else:
         response = create_resource(filename)
@@ -177,15 +179,14 @@ def upload(filename):
         values = set_json_string(title, notebook_id, body)
         if response["file_extension"] == "pdf":
             # Special handling for PDFs
-            pdf_embedded_text = extract_text_from_pdf(filename)
-            previewfile = pdf_page_to_image(filename)
+            body += "\n<!---\n"
+            body += extract_text_from_pdf(filename)
+            body += "\n-->\n"
+            previewfile = TEMP_PATH + "preview.png"
+            if not os.path.exists(previewfile):
+                previewfile = pdf_page_to_image(filename)
             img = encode_image(previewfile, "image/png")
-            # if embedded PDF text is minimal or does not exist,
-            # run OCR the preview file
-            if len(pdf_embedded_text) >= 100:
-                body += pdf_embedded_text
-            else:
-                body += extract_text_from_image(previewfile)
+            os.remove(previewfile)
             values = set_json_string(title, notebook_id, body, img)
 
     response = requests.post(SERVER + "/notes" + TOKEN, data=values)
