@@ -19,3 +19,9 @@ History
 
 * Fixed multipage OCR on PDFs
 * Added Language as a command line option
+
+
+0.5.0 (2019-11-14)
+------------------
+
+* Removed unidecode function on OCR, no longer needed
