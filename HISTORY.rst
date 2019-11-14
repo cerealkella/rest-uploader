@@ -44,3 +44,10 @@ History
 ------------------
 
 * Added --version flag on cli
+
+
+1.2.0 (2019-11-14)
+------------------
+
+* Resolved failed builds related to bumpversion and
+  manual versioning out of sync
