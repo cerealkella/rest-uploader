@@ -12,14 +12,21 @@ def set_language(language):
     LANGUAGE = language
 
 
-def pdf_valid(filename):
+def open_pdf(filename):
     try:
         pdfFileObject = open(filename, "rb")
-        PyPDF2.PdfFileReader(pdfFileObject)
-        return True
+        pdf_reader = PyPDF2.PdfFileReader(pdfFileObject, strict=False)
+        return pdf_reader
     except PyPDF2.utils.PdfReadError:
         print("PDF not fully written - no EOF Marker")
+        return None
+
+
+def pdf_valid(filename):
+    if open_pdf(filename) is None:
         return False
+    else:
+        return True
 
 
 def pdf_page_to_image(filename, page_num=0):
@@ -33,8 +40,7 @@ def pdf_page_to_image(filename, page_num=0):
 
 
 def extract_text_from_pdf(filename):
-    pdfFileObject = open(filename, "rb")
-    pdfReader = PyPDF2.PdfFileReader(pdfFileObject)
+    pdfReader = open_pdf(filename)
     count = pdfReader.numPages
     text = ""
     for i in range(count):
