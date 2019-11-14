@@ -5,6 +5,7 @@ import sys
 import click
 from .rest_uploader import watcher
 from .img_process import set_language
+from . import __version__
 
 
 @click.command()
@@ -28,6 +29,7 @@ from .img_process import set_language
             Refer to Tesseract's documentation found here:
             https://github.com/tesseract-ocr/tesseract/wiki""",
 )
+@click.version_option(version=__version__)
 def main(path=None, language="eng"):
     """ Console script for rest_uploader.
         Define file path to monitor, e.g.

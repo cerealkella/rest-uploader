@@ -25,3 +25,22 @@ History
 ------------------
 
 * Removed unidecode function on OCR, no longer needed
+
+
+0.6.0 (2019-11-14)
+------------------
+
+* Cleaned up PDF reading function
+* Syncronized versioning
+
+
+0.7.0 (2019-11-14)
+------------------
+
+* Nothing of consequence
+
+
+0.8.0 (2019-11-14)
+------------------
+
+* Added --version flag on cli
