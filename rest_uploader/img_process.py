@@ -1,7 +1,6 @@
 import PyPDF2
 import os
 from uuid import uuid4
-from unidecode import unidecode
 from PIL import Image
 from pdf2image import convert_from_path
 from pytesseract import image_to_string, TesseractError
@@ -51,8 +50,7 @@ def extract_text_from_pdf(filename):
             text += extract_text_from_image(extracted_image)
             if extracted_image != TEMP_PATH + "preview.png":
                 os.remove(extracted_image)
-
-    return unidecode(text)
+    return text
 
 
 def extract_text_from_image(filename):
@@ -61,4 +59,4 @@ def extract_text_from_image(filename):
     except TesseractError as e:
         text = "\nCheck Tesseract OCR Configuration\n"
         text += e.message
-    return unidecode(text)
+    return text
