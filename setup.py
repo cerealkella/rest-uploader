@@ -18,6 +18,7 @@ requirements = [
     "pytesseract",
     "pdf2image",
     "PyPDF2",
+    "tabulate"
 ]
 
 setup_requirements = []

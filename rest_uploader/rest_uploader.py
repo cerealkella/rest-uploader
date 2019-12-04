@@ -9,6 +9,8 @@ import base64
 import mimetypes
 import json
 import requests
+import csv
+from tabulate import tabulate
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from .img_process import (
@@ -90,6 +92,10 @@ def read_text_note(filename):
     return text
 
 
+def read_csv(filename):
+    return csv.DictReader(open(filename))
+
+
 def get_notebook_id():
     # Find the ID of the destination folder
     # adapted logic from jhf2442 on Joplin forum
@@ -166,6 +172,10 @@ def upload(filename):
             datatype = ""
     if datatype == "text/plain":
         body += read_text_note(filename)
+        values = set_json_string(title, notebook_id, body)
+    if datatype == "text/csv":
+        table = read_csv(filename)
+        body += tabulate(table, headers="keys", numalign="right", tablefmt="pipe")
         values = set_json_string(title, notebook_id, body)
     elif datatype[:5] == "image":
         img = encode_image(filename, datatype)

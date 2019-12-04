@@ -6,6 +6,9 @@ REST API File Uploader for Joplin
 Joplin client will need Webclipper service enabled.
 * Go to Tools -> Web Clipper Options -> Enable Web Clipper Service
 
+By default notes will be dropped into a notebook called "inbox".
+A future version may add a command line option to change this behavior.
+
 
 ### Tesseract
 In order for OCR text recognition to work, you'll need to download and

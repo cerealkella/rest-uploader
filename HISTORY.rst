@@ -51,3 +51,9 @@ History
 
 * Resolved failed builds related to bumpversion and
   manual versioning out of sync
+
+
+1.3.0 (2019-12-03)
+------------------
+
+* Added special processing to turn CSVs into markdown tables
