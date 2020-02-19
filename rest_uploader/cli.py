@@ -3,7 +3,7 @@
 """Console script for rest_uploader."""
 import sys
 import click
-from .rest_uploader import watcher
+from .rest_uploader import watcher, set_autotag
 from .img_process import set_language
 from . import __version__
 
@@ -29,15 +29,26 @@ from . import __version__
             Refer to Tesseract's documentation found here:
             https://github.com/tesseract-ocr/tesseract/wiki""",
 )
+@click.option(
+    "-t",
+    "--autotag",
+    "autotag",
+    default="yes",
+    help="""Specify whether or not to automatically tag notes
+            based on OCR'd text. Default = 'yes', specify 'no' 
+            if this behavior is not desired""",
+)
 @click.version_option(version=__version__)
-def main(path=None, language="eng"):
+def main(path=None, language="eng", autotag="yes"):
     """ Console script for rest_uploader.
         Define file path to monitor, e.g.
         rest_uploader /home/user/Docouments/scans    
     """
     click.echo("Launching Application " "rest_uploader.cli.main")
     set_language(language)
+    set_autotag(autotag)
     click.echo("Language: " + language)
+    click.echo("Automatically Tag Notes? " + autotag)
     watcher(path=path)
     return 0
 

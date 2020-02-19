@@ -47,7 +47,7 @@ Uploader only triggered upon new file creation, not modification
 class MyHandler(FileSystemEventHandler):
     def _event_handler(self, path):
         filename, ext = os.path.splitext(path)
-        if ext not in (".tmp", ".crdownload") and ext[:2] not in (".~"):
+        if ext not in (".tmp", ".part", ".crdownload") and ext[:2] not in (".~"):
             for i in range(10):
                 filesize = os.path.getsize(path)
                 if filesize < 1 or (ext == ".pdf" and not pdf_valid(path)):
@@ -85,6 +85,13 @@ def set_token():
     TOKEN = get_token_suffix()
 
 
+def set_autotag(autotag):
+    global AUTOTAG
+    AUTOTAG = True
+    if autotag == "no":
+        AUTOTAG = False
+
+
 def read_text_note(filename):
     with open(filename, "r") as myfile:
         text = myfile.read()
@@ -115,6 +122,17 @@ def get_notebook_id():
                         notebook_id = child.get("id")
     return notebook_id
 
+
+def apply_tags(text_to_match, note_id):
+    # Rudimentary Tag match using OCR'd text
+    res = requests.get(SERVER + "/tags" + TOKEN)
+    tags = res.json()
+    for tag in tags:
+        if tag.get("title").lower() in text_to_match.lower():
+            tag_id = tag.get("id")
+            print(f"{tag_id} matches body for {note_id}")
+            response = requests.post(SERVER + f"/tags/{tag_id}/notes" + TOKEN, data=f'{{"id": "{note_id}"}}')
+    
 
 def create_resource(filename):
     basefile = os.path.basename(filename)
@@ -202,7 +220,8 @@ def upload(filename):
     response = requests.post(SERVER + "/notes" + TOKEN, data=values)
     print(response)
     print(response.text)
-    print(response.json())
+    if AUTOTAG:
+        apply_tags(body, response.json().get("id"))
 
 
 def watcher(path=None):

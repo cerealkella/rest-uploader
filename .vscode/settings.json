@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/home/justin/.virtualenvs/rest_uploader/bin/python",
+    "python.pythonPath": "/home/justin/.virtualenvs/rest_uploader_dev/bin/python",
     "python.linting.pylintEnabled": false,
     "python.linting.flake8Enabled": true,
     "python.linting.enabled": true,
