@@ -8,6 +8,15 @@ from .img_process import set_language
 from . import __version__
 
 
+"""Helper function for wild arguments"""
+def parse_argument(arg):
+    if arg in ["No", "N", "NO", "OFF", "off", "n"]:
+        arg = "no"
+    else:
+        arg = "yes"
+    return arg
+
+
 @click.command()
 @click.argument(
     "path",
@@ -46,7 +55,8 @@ def main(path=None, language="eng", autotag="yes"):
     """
     click.echo("Launching Application " "rest_uploader.cli.main")
     set_language(language)
-    set_autotag(autotag)
+    autotag = parse_argument(autotag)
+    set_autotag(parse_argument(autotag))
     click.echo("Language: " + language)
     click.echo("Automatically Tag Notes? " + autotag)
     watcher(path=path)
