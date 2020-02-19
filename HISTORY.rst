@@ -57,3 +57,11 @@ History
 ------------------
 
 * Added special processing to turn CSVs into markdown tables
+
+
+1.4.0 (2020-02-19)
+------------------
+
+* Ignore .part files (KDE Bug)
+* Added logic to automatically assign tags to newly created notes
+* Added click option to turn off automatic tag generation
