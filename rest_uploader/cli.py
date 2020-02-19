@@ -10,7 +10,7 @@ from . import __version__
 
 """Helper function for wild arguments"""
 def parse_argument(arg):
-    if arg in ["No", "N", "NO", "OFF", "off", "n"]:
+    if arg in ["No", "N", "NO", "OFF", "off", "n", "no"]:
         arg = "no"
     else:
         arg = "yes"
