@@ -8,8 +8,8 @@ from .img_process import set_language
 from . import __version__
 
 
-"""Helper function for wild arguments"""
 def parse_argument(arg):
+    """Helper function for wild arguments"""
     if arg in ["No", "N", "NO", "OFF", "off", "n", "no"]:
         arg = "no"
     else:

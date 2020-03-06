@@ -104,9 +104,10 @@ def read_csv(filename):
 
 
 def get_notebook_id():
-    # Find the ID of the destination folder
-    # adapted logic from jhf2442 on Joplin forum
-    # https://discourse.joplin.cozic.net/t/import-txt-files/692
+    """ Find the ID of the destination folder 
+    adapted logic from jhf2442 on Joplin forum
+    https://discourse.joplin.cozic.net/t/import-txt-files/692
+    """
     res = requests.get(SERVER + "/folders" + TOKEN)
     folders = res.json()
 
@@ -124,22 +125,24 @@ def get_notebook_id():
 
 
 def apply_tags(text_to_match, note_id):
-    # Rudimentary Tag match using OCR'd text
+    """ Rudimentary Tag match using OCR'd text """
     res = requests.get(SERVER + "/tags" + TOKEN)
     tags = res.json()
     for tag in tags:
         if tag.get("title").lower() in text_to_match.lower():
             tag_id = tag.get("id")
             print(f"{tag_id} matches body for {note_id}")
-            response = requests.post(SERVER + f"/tags/{tag_id}/notes" + TOKEN, data=f'{{"id": "{note_id}"}}')
-    
+            response = requests.post(
+                SERVER + f"/tags/{tag_id}/notes" + TOKEN, data=f'{{"id": "{note_id}"}}'
+            )
+
 
 def create_resource(filename):
     basefile = os.path.basename(filename)
     title = os.path.splitext(basefile)[0]
     files = {
         "data": (json.dumps(filename), open(filename, "rb")),
-        "props": (None, '{{"title":"{}", "filename":"{}"}}'.format(title, basefile)),
+        "props": (None, f'{{"title":"{title}", "filename":"{basefile}"}}'),
     }
     response = requests.post(SERVER + "/resources" + TOKEN, files=files)
     print(response.json())
@@ -160,7 +163,7 @@ def get_resource(resource_id):
 
 def encode_image(filename, datatype):
     encoded = base64.b64encode(open(filename, "rb").read())
-    img = "data:{};base64,{}".format(datatype, encoded.decode())
+    img = f"data:{datatype};base64,{encoded.decode()}"
     return img
 
 
@@ -203,7 +206,7 @@ def upload(filename):
         values = set_json_string(title, notebook_id, body, img)
     else:
         response = create_resource(filename)
-        body += "[{}](:/{})".format(basefile, response["id"])
+        body += f"[{basefile}](:/{response['id']})"
         values = set_json_string(title, notebook_id, body)
         if response["file_extension"] == "pdf":
             # Special handling for PDFs
@@ -231,7 +234,7 @@ def watcher(path=None):
         path = str(Path.home())
 
     event_handler = MyHandler()
-    print("Monitoring directory {} for files".format(path))
+    print(f"Monitoring directory {path} for files")
     observer = Observer()
     observer.schedule(event_handler, path=path, recursive=False)
     observer.start()

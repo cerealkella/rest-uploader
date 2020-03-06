@@ -23,7 +23,7 @@ def get_header():
     try:
         my_token = get_token()
         url = SERVER + "/ping"
-        head = {"Authorization": "Bearer {}".format(my_token)}
+        head = {"Authorization": f"Bearer {my_token}"}
         try:
             response = requests.get(url, headers=head)
             if response.status_code != 200:

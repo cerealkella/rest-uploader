@@ -18,7 +18,7 @@ requirements = [
     "pytesseract",
     "pdf2image",
     "PyPDF2",
-    "tabulate"
+    "tabulate",
 ]
 
 setup_requirements = []
@@ -54,6 +54,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/kellerjustin/rest-uploader",
-    version='1.5.0',
+    version="1.5.0",
     zip_safe=False,
 )
