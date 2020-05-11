@@ -1,15 +1,29 @@
 import PyPDF2
 import os
+import platform
 from uuid import uuid4
 from PIL import Image
 from pdf2image import convert_from_path
 from pytesseract import image_to_string, TesseractError
-from .settings import TEMP_PATH
+
+
+TEMP_PATH = "/tmp/"
 
 
 def set_language(language):
     global LANGUAGE
     LANGUAGE = language
+
+
+def set_temp_path():
+    global TEMP_PATH
+    architecture = platform.os.name
+    if architecture == "nt":
+        TEMP_PATH = "%USERPROFILE%\AppData\Local\Temp"
+    else:  # posix
+        TEMP_PATH = "/tmp/"
+    print(f"System Architecture: {architecture}")
+    print(f"Temp Path: {TEMP_PATH}")
 
 
 def open_pdf(filename):

@@ -18,6 +18,7 @@ from .img_process import (
     extract_text_from_pdf,
     pdf_page_to_image,
     pdf_valid,
+    TEMP_PATH,
 )
 from .settings import SERVER, JOPLIN_NOTEBOOK
 from .api_token import get_token_suffix
@@ -80,15 +81,6 @@ def set_working_directory():
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 
-def set_temp_directory():
-    global TEMP_PATH
-    print(platform.os.name)
-    if platform.os.name == "nt":
-        TEMP_PATH = "%USERPROFILE%\AppData\Local\Temp"
-    else: #posix
-        TEMP_PATH = "/tmp/"
-
-
 def set_token():
     global TOKEN
     TOKEN = get_token_suffix()
@@ -99,6 +91,31 @@ def set_autotag(autotag):
     AUTOTAG = True
     if autotag == "no":
         AUTOTAG = False
+
+
+def set_notebook_id(notebook_name):
+    """ Find the ID of the destination folder 
+    adapted logic from jhf2442 on Joplin forum
+    https://discourse.joplin.cozic.net/t/import-txt-files/692
+    """
+    global NOTEBOOK_ID
+    NOTEBOOK_ID = 0
+    try:
+        res = requests.get(SERVER + "/folders" + TOKEN)
+        folders = res.json()
+        for folder in folders:
+            if folder.get("title") == notebook_name:
+                NOTEBOOK_ID = folder.get("id")
+        if NOTEBOOK_ID == 0:
+            for folder in folders:
+                if "children" in folder:
+                    for child in folder.get("children"):
+                        if child.get("title") == notebook_name:
+                            NOTEBOOK_ID = child.get("id")
+        return NOTEBOOK_ID
+    except requests.ConnectionError as e:
+        print("Connection Error - Is Joplin Running?")
+        return -1
 
 
 def read_text_note(filename):
@@ -112,38 +129,19 @@ def read_csv(filename):
     return csv.DictReader(open(filename))
 
 
-def get_notebook_id():
-    """ Find the ID of the destination folder 
-    adapted logic from jhf2442 on Joplin forum
-    https://discourse.joplin.cozic.net/t/import-txt-files/692
-    """
-    res = requests.get(SERVER + "/folders" + TOKEN)
-    folders = res.json()
-
-    notebook_id = 0
-    for folder in folders:
-        if folder.get("title") == JOPLIN_NOTEBOOK:
-            notebook_id = folder.get("id")
-    if notebook_id == 0:
-        for folder in folders:
-            if "children" in folder:
-                for child in folder.get("children"):
-                    if child.get("title") == JOPLIN_NOTEBOOK:
-                        notebook_id = child.get("id")
-    return notebook_id
-
-
 def apply_tags(text_to_match, note_id):
     """ Rudimentary Tag match using OCR'd text """
     res = requests.get(SERVER + "/tags" + TOKEN)
     tags = res.json()
+    counter = 0
     for tag in tags:
         if tag.get("title").lower() in text_to_match.lower():
+            counter += 1
             tag_id = tag.get("id")
-            print(f"{tag_id} matches body for {note_id}")
             response = requests.post(
                 SERVER + f"/tags/{tag_id}/notes" + TOKEN, data=f'{{"id": "{note_id}"}}'
             )
+    print(f"Matched {counter} tag(s) for note {note_id}")
 
 
 def create_resource(filename):
@@ -176,20 +174,19 @@ def encode_image(filename, datatype):
     return img
 
 
-def set_json_string(title, notebook_id, body, img=None):
+def set_json_string(title, NOTEBOOK_ID, body, img=None):
     if img is None:
         return '{{ "title": {}, "parent_id": "{}", "body": {} }}'.format(
-            json.dumps(title), notebook_id, json.dumps(body)
+            json.dumps(title), NOTEBOOK_ID, json.dumps(body)
         )
     else:
         return '{{ "title": "{}", "parent_id": "{}", "body": {}, "image_data_url": "{}" }}'.format(
-            title, notebook_id, json.dumps(body), img
+            title, NOTEBOOK_ID, json.dumps(body), img
         )
 
 
 def upload(filename):
     """ Get the default Notebook ID and process the passed in file"""
-    notebook_id = get_notebook_id()
     basefile = os.path.basename(filename)
     title, ext = os.path.splitext(basefile)
     body = basefile + " uploaded from " + platform.node() + "\n"
@@ -202,21 +199,21 @@ def upload(filename):
             datatype = ""
     if datatype == "text/plain":
         body += read_text_note(filename)
-        values = set_json_string(title, notebook_id, body)
+        values = set_json_string(title, NOTEBOOK_ID, body)
     if datatype == "text/csv":
         table = read_csv(filename)
         body += tabulate(table, headers="keys", numalign="right", tablefmt="pipe")
-        values = set_json_string(title, notebook_id, body)
+        values = set_json_string(title, NOTEBOOK_ID, body)
     elif datatype[:5] == "image":
         img = encode_image(filename, datatype)
         body += "\n<!---\n"
         body += extract_text_from_image(filename)
         body += "\n-->\n"
-        values = set_json_string(title, notebook_id, body, img)
+        values = set_json_string(title, NOTEBOOK_ID, body, img)
     else:
         response = create_resource(filename)
         body += f"[{basefile}](:/{response['id']})"
-        values = set_json_string(title, notebook_id, body)
+        values = set_json_string(title, NOTEBOOK_ID, body)
         if response["file_extension"] == "pdf":
             # Special handling for PDFs
             body += "\n<!---\n"
@@ -227,7 +224,7 @@ def upload(filename):
                 previewfile = pdf_page_to_image(filename)
             img = encode_image(previewfile, "image/png")
             os.remove(previewfile)
-            values = set_json_string(title, notebook_id, body, img)
+            values = set_json_string(title, NOTEBOOK_ID, body, img)
 
     response = requests.post(SERVER + "/notes" + TOKEN, data=values)
     print(response)
@@ -237,9 +234,8 @@ def upload(filename):
 
 
 def watcher(path=None):
-    set_working_directory()
-    set_token()
-    set_temp_directory()
+    # set_working_directory()
+    # set_token()
     if path is None:
         path = str(Path.home())
 
