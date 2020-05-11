@@ -80,6 +80,15 @@ def set_working_directory():
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 
+def set_temp_directory():
+    global TEMP_PATH
+    print(platform.os.name)
+    if platform.os.name == "nt":
+        TEMP_PATH = "%USERPROFILE%\AppData\Local\Temp"
+    else: #posix
+        TEMP_PATH = "/tmp/"
+
+
 def set_token():
     global TOKEN
     TOKEN = get_token_suffix()
@@ -230,6 +239,7 @@ def upload(filename):
 def watcher(path=None):
     set_working_directory()
     set_token()
+    set_temp_directory()
     if path is None:
         path = str(Path.home())
 
