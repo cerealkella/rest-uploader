@@ -20,7 +20,6 @@ from .img_process import (
     pdf_valid,
     TEMP_PATH,
 )
-from .settings import SERVER, JOPLIN_NOTEBOOK
 from .api_token import get_token_suffix
 from pathlib import Path
 
@@ -93,6 +92,12 @@ def set_autotag(autotag):
         AUTOTAG = False
 
 
+def set_endpoint(server, port):
+    global ENDPOINT
+    ENDPOINT = f"http://{server}:{port}"
+    print(f"Endpoint: {ENDPOINT}")
+
+
 def set_notebook_id(notebook_name):
     """ Find the ID of the destination folder 
     adapted logic from jhf2442 on Joplin forum
@@ -101,7 +106,7 @@ def set_notebook_id(notebook_name):
     global NOTEBOOK_ID
     NOTEBOOK_ID = 0
     try:
-        res = requests.get(SERVER + "/folders" + TOKEN)
+        res = requests.get(ENDPOINT + "/folders" + TOKEN)
         folders = res.json()
         for folder in folders:
             if folder.get("title") == notebook_name:
@@ -131,7 +136,7 @@ def read_csv(filename):
 
 def apply_tags(text_to_match, note_id):
     """ Rudimentary Tag match using OCR'd text """
-    res = requests.get(SERVER + "/tags" + TOKEN)
+    res = requests.get(ENDPOINT + "/tags" + TOKEN)
     tags = res.json()
     counter = 0
     for tag in tags:
@@ -139,7 +144,8 @@ def apply_tags(text_to_match, note_id):
             counter += 1
             tag_id = tag.get("id")
             response = requests.post(
-                SERVER + f"/tags/{tag_id}/notes" + TOKEN, data=f'{{"id": "{note_id}"}}'
+                ENDPOINT + f"/tags/{tag_id}/notes" + TOKEN,
+                data=f'{{"id": "{note_id}"}}',
             )
     print(f"Matched {counter} tag(s) for note {note_id}")
 
@@ -151,19 +157,19 @@ def create_resource(filename):
         "data": (json.dumps(filename), open(filename, "rb")),
         "props": (None, f'{{"title":"{title}", "filename":"{basefile}"}}'),
     }
-    response = requests.post(SERVER + "/resources" + TOKEN, files=files)
+    response = requests.post(ENDPOINT + "/resources" + TOKEN, files=files)
     print(response.json())
     return response.json()
 
 
 def delete_resource(resource_id):
-    apitext = SERVER + "/resources/" + resource_id + TOKEN
+    apitext = ENDPOINT + "/resources/" + resource_id + TOKEN
     response = requests.delete(apitext)
     return response
 
 
 def get_resource(resource_id):
-    apitext = SERVER + "/resources/" + resource_id + TOKEN
+    apitext = ENDPOINT + "/resources/" + resource_id + TOKEN
     response = requests.get(apitext)
     return response
 
@@ -226,7 +232,7 @@ def upload(filename):
             os.remove(previewfile)
             values = set_json_string(title, NOTEBOOK_ID, body, img)
 
-    response = requests.post(SERVER + "/notes" + TOKEN, data=values)
+    response = requests.post(ENDPOINT + "/notes" + TOKEN, data=values)
     print(response)
     print(response.text)
     if AUTOTAG:

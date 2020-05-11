@@ -1,6 +1,4 @@
-import requests
 from os import path
-from .settings import SERVER
 
 
 def get_token():
@@ -18,7 +16,14 @@ def get_token_suffix():
     return "?token=" + get_token()
 
 
-# Code from a non-Joplin API
+"""
+Code from a non-Joplin API
+Not currently used
+"""
+
+"""
+import requests
+
 def get_header():
     try:
         my_token = get_token()
@@ -33,3 +38,4 @@ def get_header():
     except FileNotFoundError:
         print("No Token!")
     return head
+"""

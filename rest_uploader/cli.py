@@ -8,6 +8,7 @@ from .rest_uploader import (
     set_autotag,
     set_notebook_id,
     set_working_directory,
+    set_endpoint,
     set_token,
 )
 from .img_process import set_language, set_temp_path
@@ -34,6 +35,22 @@ def parse_argument(arg):
         readable=True,
         resolve_path=True,
     ),
+)
+@click.option(
+    "-s",
+    "--server",
+    "server",
+    default="127.0.0.1",
+    help="""Specify the server to which the application 
+            should connect. Default = "127.0.0.1". """,
+)
+@click.option(
+    "-p",
+    "--port",
+    "port",
+    default="41184",
+    help="""Specify the port to which the application 
+            should connect. Default = "41184". """,
 )
 @click.option(
     "-l",
@@ -63,15 +80,22 @@ def parse_argument(arg):
             newly created notes. Default = "inbox". """,
 )
 @click.version_option(version=__version__)
-def main(path=None, language="eng", autotag="yes", destination="inbox"):
+def main(
+    path=None,
+    server="server",
+    port="port",
+    language="eng",
+    autotag="yes",
+    destination="inbox",
+):
     """ Console script for rest_uploader.
         Define file path to monitor, e.g.
         rest_uploader /home/user/Docouments/scans    
     """
     click.echo("Launching Application " "rest_uploader.cli.main")
     set_working_directory()
+    set_endpoint(server, port)
     set_token()
-    set_language(language)
     set_temp_path()
     notebook_id = set_notebook_id(destination.strip())
     if notebook_id == -1:
@@ -82,6 +106,7 @@ def main(path=None, language="eng", autotag="yes", destination="inbox"):
         return 0
     else:
         click.echo(f"Found Notebook ID: {notebook_id}")
+    set_language(language)
     autotag = parse_argument(autotag)
     set_autotag(parse_argument(autotag))
     click.echo("Language: " + language)
