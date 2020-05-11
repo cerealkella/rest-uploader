@@ -19,7 +19,7 @@ from .img_process import (
     pdf_page_to_image,
     pdf_valid,
 )
-from .settings import SERVER, JOPLIN_NOTEBOOK, TEMP_PATH
+from .settings import SERVER, JOPLIN_NOTEBOOK
 from .api_token import get_token_suffix
 from pathlib import Path
 
