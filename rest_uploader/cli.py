@@ -41,43 +41,42 @@ def parse_argument(arg):
     "--server",
     "server",
     default="127.0.0.1",
-    help="""Specify the server to which the application 
-            should connect. Default = "127.0.0.1". """,
+    help="""Specify the server to which the application"""
+    """ should connect. Default = "127.0.0.1" """,
 )
 @click.option(
     "-p",
     "--port",
     "port",
     default="41184",
-    help="""Specify the port to which the application 
-            should connect. Default = "41184". """,
+    help="""Specify the port to which the application should connect."""
+    """ Default = 41184 """,
 )
 @click.option(
     "-l",
     "--language",
     "language",
     default="eng",
-    help="""Specify OCR Language. 
-            Refer to Tesseract's documentation found here:
-            https://github.com/tesseract-ocr/tesseract/wiki""",
+    help="""Specify OCR Language. Refer to Tesseract's documentation found here: 
+    https://github.com/tesseract-ocr/tesseract/wiki""",
 )
 @click.option(
     "-t",
     "--autotag",
     "autotag",
     default="yes",
-    help="""Specify whether or not to automatically tag notes
-            based on OCR'd text. Default = 'yes', specify 'no' 
-            if this behavior is not desired""",
+    help="""Specify whether or not to automatically tag notes based on"""
+    """ OCR'd text. Default = 'yes', specify 'no' if this behavior is"""
+    """ not desired""",
 )
 @click.option(
     "-d",
     "--destination",
     "destination",
     default="inbox",
-    help="""Specify the notebook in which to place
-            This notebook must exist or program will exit
-            newly created notes. Default = "inbox". """,
+    help="""Specify the notebook in which to place newly created notes."""
+    """ Specified notebook must exist or program will exit."""
+    """ Default = "inbox". """,
 )
 @click.version_option(version=__version__)
 def main(
