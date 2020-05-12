@@ -54,6 +54,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/kellerjustin/rest-uploader",
-    version="version='1.7.0'",
+    version="version='1.8.0'",
     zip_safe=False,
 )
