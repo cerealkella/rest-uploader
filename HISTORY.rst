@@ -92,3 +92,9 @@ History
 * Immediately realized closing application if Joplin isn't running is
   a bad idea in the case of startup scripts, etc - fixed logic to wait
 * Made use of the tempfile library which made life easier
+
+
+1.10.0 (2020-05-12)
+------------------
+
+* Fixed minor but annoying typo on a print statement

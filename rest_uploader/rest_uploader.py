@@ -250,7 +250,7 @@ def upload(filename):
     # print(response.text)
     if AUTOTAG:
         apply_tags(body, response.json().get("id"))
-    print(f"Placed into note into notebook {NOTEBOOK_ID}: {NOTEBOOK_NAME}")
+    print(f"Placed note into notebook {NOTEBOOK_ID}: {NOTEBOOK_NAME}")
     return 0
 
 
