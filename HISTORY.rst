@@ -86,8 +86,9 @@ History
   detecting OS on startup
 
 
-1.8.0 (2020-05-12)
+1.9.0 (2020-05-12)
 ------------------
 
 * Immediately realized closing application if Joplin isn't running is
   a bad idea in the case of startup scripts, etc - fixed logic to wait
+* Made use of the tempfile library which made life easier
