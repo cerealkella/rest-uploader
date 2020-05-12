@@ -95,6 +95,6 @@ History
 
 
 1.10.0 (2020-05-12)
-------------------
+-------------------
 
 * Fixed minor but annoying typo on a print statement
