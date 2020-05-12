@@ -98,10 +98,11 @@ def main(
     set_temp_path()
     notebook_id = set_notebook_id(destination.strip())
     if notebook_id == -1:
-        click.echo("Unable to run rest_uploader -- check to see if Joplin is running")
-        return 0
+        click.echo("Joplin may not be running, please ensure it is open.")
+        click.echo("     will check again when processing a file.")
     elif notebook_id == 0:
         click.echo(f"Invalid Notebook, check to see if {destination.strip()} exists.")
+        click.echo(f"Please specify a valid notebook. Quitting application.")
         return 0
     else:
         click.echo(f"Found Notebook ID: {notebook_id}")

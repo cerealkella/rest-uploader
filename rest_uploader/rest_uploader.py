@@ -98,29 +98,40 @@ def set_endpoint(server, port):
     print(f"Endpoint: {ENDPOINT}")
 
 
-def set_notebook_id(notebook_name):
+def initialize_notebook(notebook_name):
+    global NOTEBOOK_NAME
+    NOTEBOOK_NAME = notebook_name
+    global NOTEBOOK_ID
+    NOTEBOOK_ID = 0
+    return NOTEBOOK_NAME
+
+
+def set_notebook_id(notebook_name=None):
     """ Find the ID of the destination folder 
     adapted logic from jhf2442 on Joplin forum
     https://discourse.joplin.cozic.net/t/import-txt-files/692
     """
+    global NOTEBOOK_NAME
     global NOTEBOOK_ID
-    NOTEBOOK_ID = 0
+    if notebook_name is not None:
+        NOTEBOOK_NAME = initialize_notebook(notebook_name)
     try:
         res = requests.get(ENDPOINT + "/folders" + TOKEN)
         folders = res.json()
         for folder in folders:
-            if folder.get("title") == notebook_name:
+            if folder.get("title") == NOTEBOOK_NAME:
                 NOTEBOOK_ID = folder.get("id")
         if NOTEBOOK_ID == 0:
             for folder in folders:
                 if "children" in folder:
                     for child in folder.get("children"):
-                        if child.get("title") == notebook_name:
+                        if child.get("title") == NOTEBOOK_NAME:
                             NOTEBOOK_ID = child.get("id")
         return NOTEBOOK_ID
     except requests.ConnectionError as e:
+        NOTEBOOK_ID = -1
         print("Connection Error - Is Joplin Running?")
-        return -1
+        return NOTEBOOK_ID
 
 
 def read_text_note(filename):
@@ -148,9 +159,12 @@ def apply_tags(text_to_match, note_id):
                 data=f'{{"id": "{note_id}"}}',
             )
     print(f"Matched {counter} tag(s) for note {note_id}")
+    print(f"Placed into note into notebook {NOTEBOOK_ID}: {NOTEBOOK_NAME}")
 
 
 def create_resource(filename):
+    if NOTEBOOK_ID <= 0:
+        set_notebook_id()
     basefile = os.path.basename(filename)
     title = os.path.splitext(basefile)[0]
     files = {
@@ -240,11 +254,8 @@ def upload(filename):
 
 
 def watcher(path=None):
-    # set_working_directory()
-    # set_token()
     if path is None:
         path = str(Path.home())
-
     event_handler = MyHandler()
     print(f"Monitoring directory {path} for files")
     observer = Observer()
