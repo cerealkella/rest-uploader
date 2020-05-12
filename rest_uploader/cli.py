@@ -97,10 +97,10 @@ def main(
     set_token()
     set_temp_path()
     notebook_id = set_notebook_id(destination.strip())
-    if notebook_id == -1:
+    if notebook_id == "err":
         click.echo("Joplin may not be running, please ensure it is open.")
         click.echo("     will check again when processing a file.")
-    elif notebook_id == 0:
+    elif notebook_id == "":
         click.echo(f"Invalid Notebook, check to see if {destination.strip()} exists.")
         click.echo(f"Please specify a valid notebook. Quitting application.")
         return 0

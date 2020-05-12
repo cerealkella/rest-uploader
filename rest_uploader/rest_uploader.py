@@ -102,7 +102,7 @@ def initialize_notebook(notebook_name):
     global NOTEBOOK_NAME
     NOTEBOOK_NAME = notebook_name
     global NOTEBOOK_ID
-    NOTEBOOK_ID = 0
+    NOTEBOOK_ID = ""
     return NOTEBOOK_NAME
 
 
@@ -121,7 +121,7 @@ def set_notebook_id(notebook_name=None):
         for folder in folders:
             if folder.get("title") == NOTEBOOK_NAME:
                 NOTEBOOK_ID = folder.get("id")
-        if NOTEBOOK_ID == 0:
+        if NOTEBOOK_ID == "":
             for folder in folders:
                 if "children" in folder:
                     for child in folder.get("children"):
@@ -129,9 +129,8 @@ def set_notebook_id(notebook_name=None):
                             NOTEBOOK_ID = child.get("id")
         return NOTEBOOK_ID
     except requests.ConnectionError as e:
-        NOTEBOOK_ID = -1
         print("Connection Error - Is Joplin Running?")
-        return NOTEBOOK_ID
+        return "err"
 
 
 def read_text_note(filename):
@@ -159,11 +158,11 @@ def apply_tags(text_to_match, note_id):
                 data=f'{{"id": "{note_id}"}}',
             )
     print(f"Matched {counter} tag(s) for note {note_id}")
-    print(f"Placed into note into notebook {NOTEBOOK_ID}: {NOTEBOOK_NAME}")
+    return counter
 
 
 def create_resource(filename):
-    if NOTEBOOK_ID <= 0:
+    if NOTEBOOK_ID == "":
         set_notebook_id()
     basefile = os.path.basename(filename)
     title = os.path.splitext(basefile)[0]
@@ -209,7 +208,7 @@ def upload(filename):
     """ Get the default Notebook ID and process the passed in file"""
     basefile = os.path.basename(filename)
     title, ext = os.path.splitext(basefile)
-    body = basefile + " uploaded from " + platform.node() + "\n"
+    body = f"{basefile} uploaded from {platform.node()}\n"
     datatype = mimetypes.guess_type(filename)[0]
     if datatype is None:
         # avoid subscript exception if datatype is None
@@ -239,7 +238,7 @@ def upload(filename):
             body += "\n<!---\n"
             body += extract_text_from_pdf(filename)
             body += "\n-->\n"
-            previewfile = TEMP_PATH + "preview.png"
+            previewfile = f"{TEMP_PATH}\preview.png"
             if not os.path.exists(previewfile):
                 previewfile = pdf_page_to_image(filename)
             img = encode_image(previewfile, "image/png")
@@ -247,10 +246,12 @@ def upload(filename):
             values = set_json_string(title, NOTEBOOK_ID, body, img)
 
     response = requests.post(ENDPOINT + "/notes" + TOKEN, data=values)
-    print(response)
-    print(response.text)
+    # print(response)
+    # print(response.text)
     if AUTOTAG:
         apply_tags(body, response.json().get("id"))
+    print(f"Placed into note into notebook {NOTEBOOK_ID}: {NOTEBOOK_NAME}")
+    return 0
 
 
 def watcher(path=None):
