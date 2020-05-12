@@ -41,9 +41,9 @@ def pdf_page_to_image(filename, page_num=0):
     global TEMP_PATH
     pages = convert_from_path(filename, 250)
     if page_num == 0:
-        tempfile = f"{TEMP_PATH}\preview.png"
+        tempfile = f"{TEMP_PATH}/preview.png"
     else:
-        tempfile = f"{TEMP_PATH}\{uuid4()}.png"
+        tempfile = f"{TEMP_PATH}/{uuid4()}.png"
     pages[page_num].save(tempfile, "PNG")
     return tempfile
 
