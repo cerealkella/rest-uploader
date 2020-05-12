@@ -6,9 +6,6 @@ REST API File Uploader for Joplin
 Joplin client will need Webclipper service enabled.
 * Go to Tools -> Web Clipper Options -> Enable Web Clipper Service
 
-By default notes will be dropped into a notebook called "inbox".
-A future version may add a command line option to change this behavior.
-
 
 ### Tesseract
 In order for OCR text recognition to work, you'll need to download and
@@ -36,3 +33,18 @@ To launch as python module:
 Version 0.4.0 added language support via Tesseract (check Tesseract docs). To enable:
 
 ` rest_uploader /path/to/directory --language ger `
+
+### Additional Command Line Options added in version 1.8.0
+By default notes will be dropped into a notebook called "inbox".
+Specify a different upload notebook by specifying a destination from the
+command line using -d or --destination
+
+rest_uploader will fail if the specified notebook does not exist
+I am guessing if you have two notebooks with the same name, it will dump
+new notes in the first one it finds.
+
+Default server = 127.0.0.1
+To specify a different server, use the --s or --server cli option
+
+Default port = 41184
+To specify a different port, use the --p or --port cli option
