@@ -82,10 +82,12 @@ History
 * Removed the settings.py file - everything handled via command line
   switches
 * More verbose command line notifications
+* Not leaving temp file location setting to user, handling this by 
+  detecting OS on startup
 
 
 1.8.0 (2020-05-12)
 ------------------
+
 * Immediately realized closing application if Joplin isn't running is
   a bad idea in the case of startup scripts, etc - fixed logic to wait
-
