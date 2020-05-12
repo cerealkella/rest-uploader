@@ -71,3 +71,21 @@ History
 ------------------
 
 * Embarrassingly dumb bug fix for autotag argument
+
+
+1.7.0 (2020-05-11)
+------------------
+
+* Added command line options for server, port, destination notebook
+* Added some error handling to quit when Joplin is closed or there
+  is no valid notebook detected
+* Removed the settings.py file - everything handled via command line
+  switches
+* More verbose command line notifications
+
+
+1.8.0 (2020-05-12)
+------------------
+* Immediately realized closing application if Joplin isn't running is
+  a bad idea in the case of startup scripts, etc - fixed logic to wait
+
