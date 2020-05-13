@@ -30,8 +30,8 @@ To launch as python module:
 ` python -m rest_uploader.cli /path/to/directory `
 
 ### Languages other than English
-Version 0.4.0 added language support via Tesseract (check Tesseract docs). To enable:
-
+Version 0.4.0 added language support via Tesseract (check Tesseract docs). To enable, use the cli -l or --language argument.
+The following example will OCR text using the German dictionary:
 ` rest_uploader /path/to/directory --language ger `
 
 ### Additional Command Line Options added in version 1.8.0
@@ -44,7 +44,11 @@ I am guessing if you have two notebooks with the same name, it will dump
 new notes in the first one it finds.
 
 Default server = 127.0.0.1
-To specify a different server, use the --s or --server cli option
+To specify a different server, use the -s or --server cli option
 
 Default port = 41184
-To specify a different port, use the --p or --port cli option
+To specify a different port, use the -p or --port cli option
+
+It doesn't matter if the options are before or after the path. Path is mandatory, though.
+The following example will upload newly created notes to the Taxes Notebook, and disable autotagging:
+` rest_uploader -d "Taxes" -t no /path/to/directory `
