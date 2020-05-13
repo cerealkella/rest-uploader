@@ -49,6 +49,11 @@ To specify a different server, use the -s or --server cli option
 Default port = 41184
 To specify a different port, use the -p or --port cli option
 
+Default autotagging behavior = yes
+To turn off autotagging, use the -t or --autotag option
+Example:
+` rest_uploader /path/to/directory -t no `
+
 It doesn't matter if the options are before or after the path. Path is mandatory, though.
-The following example will upload newly created notes to the Taxes Notebook, and disable autotagging:
-` rest_uploader -d "Taxes" -t no /path/to/directory `
+The following example will upload newly created notes to the Taxes Notebook, and OCR in German:
+` rest_uploader -d "Taxes" -l ger /path/to/directory `
