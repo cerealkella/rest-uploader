@@ -111,7 +111,7 @@ def main(
     set_autotag(parse_argument(autotag))
     click.echo("Language: " + language)
     click.echo("Automatically Tag Notes? " + autotag)
-    click.echo("Desitnation Notebook: " + destination)
+    click.echo("Destination Notebook: " + destination)
     watcher(path=path)
     return 0
 

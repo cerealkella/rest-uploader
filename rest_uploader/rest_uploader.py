@@ -258,7 +258,7 @@ def watcher(path=None):
     if path is None:
         path = str(Path.home())
     event_handler = MyHandler()
-    print(f"Monitoring directory {path} for files")
+    print(f"Monitoring directory: {path}")
     observer = Observer()
     observer.schedule(event_handler, path=path, recursive=False)
     observer.start()
