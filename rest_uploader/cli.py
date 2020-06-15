@@ -10,8 +10,9 @@ from .rest_uploader import (
     set_working_directory,
     set_endpoint,
     set_token,
+    set_language,
+    set_rotation,
 )
-from .img_process import set_language, set_temp_path
 from . import __version__
 
 
@@ -78,6 +79,14 @@ def parse_argument(arg):
     """ Specified notebook must exist or program will exit."""
     """ Default = "inbox". """,
 )
+@click.option(
+    "-r",
+    "--rotation",
+    "rotation",
+    default="0",
+    help="""Specify whether to rotate images."""
+    """ Default = 0 (no rotation). """,
+)
 @click.version_option(version=__version__)
 def main(
     path=None,
@@ -86,6 +95,7 @@ def main(
     language="eng",
     autotag="yes",
     destination="inbox",
+    rotation=0,
 ):
     """ Console script for rest_uploader.
         Define file path to monitor, e.g.
@@ -95,7 +105,7 @@ def main(
     set_working_directory()
     set_endpoint(server, port)
     set_token()
-    set_temp_path()
+    # set_temp_path() # Do I need to do this here?
     notebook_id = set_notebook_id(destination.strip())
     if notebook_id == "err":
         click.echo("Joplin may not be running, please ensure it is open.")
@@ -109,9 +119,11 @@ def main(
     set_language(language)
     autotag = parse_argument(autotag)
     set_autotag(parse_argument(autotag))
+    set_rotation(rotation)
     click.echo("Language: " + language)
     click.echo("Automatically Tag Notes? " + autotag)
     click.echo("Destination Notebook: " + destination)
+    click.echo("Rotation: " + rotation)
     watcher(path=path)
     return 0
 
