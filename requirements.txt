@@ -1,7 +1,5 @@
 watchdog
 requests
-pytesseract
-pdf2image
-PyPDF2
 tabulate
 click
+img_processor
