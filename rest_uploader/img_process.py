@@ -10,14 +10,14 @@ import base64
 
 class ImageProcessor:
     def __init__(self, language="eng"):
-        self.LANGUAGE = language
-        print(f"Language: {self.LANGUAGE}")
+        self.set_language(language)
         self.TEMP_PATH = tempfile.gettempdir()
         print(f"Temp Path: {self.TEMP_PATH}")
         self.PREVIEWFILE = ""
 
     def set_language(self, language):
         self.LANGUAGE = language
+        print(f"Language: {self.LANGUAGE}")
 
     def open_pdf(self, filename):
         try:
