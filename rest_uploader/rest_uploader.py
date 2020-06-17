@@ -12,7 +12,7 @@ import csv
 from tabulate import tabulate
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from .img_process import ImageProcessor
+from img_processor import ImageProcessor
 from .api_token import get_token_suffix
 from pathlib import Path
 
@@ -39,12 +39,17 @@ Uploader only triggered upon new file creation, not modification
 
 class MyHandler(FileSystemEventHandler):
     def _event_handler(self, path):
+        max_retries = 10
         filename, ext = os.path.splitext(path)
         if ext not in (".tmp", ".part", ".crdownload") and ext[:2] not in (".~"):
-            for i in range(10):
+            for i in range(max_retries):
                 filesize = os.path.getsize(path)
                 if filesize < 1 or not self.valid_file(ext, path):
-                    self.retry(i)
+                    print("Incomplete file. Retrying...")
+                    if i == max_retries:
+                        print("timeout error, invalid file")
+                        return False
+                    time.sleep(5)
                 elif filesize > 10000000:
                     print(f"Filesize = {filesize}. Too big for Joplin, skipping upload")
                     break
@@ -59,14 +64,7 @@ class MyHandler(FileSystemEventHandler):
             img_processor = ImageProcessor(LANGUAGE)
             return img_processor.pdf_valid(path)
         else:
-            return True
-
-    def retry(self, max_retries):
-        print("Incomplete file. Retrying...")
-        if i == max_retries:
-            print("timeout error, invalid file")
-            return False
-        time.sleep(5)
+            return True 
 
     def on_created(self, event):
         print(event.event_type + " -- " + event.src_path)
