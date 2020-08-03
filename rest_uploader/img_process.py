@@ -71,7 +71,8 @@ def extract_text_from_pdf(filename):
 
 def extract_text_from_image(filename):
     try:
-        text = image_to_string(Image.open(filename), lang=LANGUAGE)
+        custom_config = r'-c preserve_interword_spaces=1'
+        text = image_to_string(Image.open(filename), lang=LANGUAGE, config=custom_config)
     except TesseractError as e:
         text = "\nCheck Tesseract OCR Configuration\n"
         text += e.message
