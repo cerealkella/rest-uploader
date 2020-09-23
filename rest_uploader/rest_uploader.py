@@ -3,6 +3,8 @@
 """Main module. Launch by running python -m rest_uploader.cli"""
 
 import os
+import shutil
+import tempfile
 import platform
 import time
 import mimetypes
@@ -104,9 +106,19 @@ def set_endpoint(server, port):
     print(f"Endpoint: {ENDPOINT}")
 
 
-def set_rotation(degrees):
-    global ROTATION
-    ROTATION = int(degrees)
+def set_autorotation(autorotation):
+    global AUTOROTATION
+    AUTOROTATION = True
+    if autorotation == "no":
+        AUTOROTATION = False
+
+
+def set_moveto(moveto):
+    global MOVETO
+    if moveto == tempfile.gettempdir():
+        moveto = ""
+    MOVETO = moveto
+    return MOVETO
 
 
 def initialize_notebook(notebook_name):
@@ -230,12 +242,10 @@ def upload(filename):
         values = set_json_string(title, NOTEBOOK_ID, body)
     elif datatype[:5] == "image":
         img_processor = ImageProcessor(LANGUAGE)
-        if ROTATION != 0:
-            img_processor.rotate_image(filename, ROTATION)
-        img = img_processor.encode_image(filename, datatype)
         body += "\n<!---\n"
-        body += img_processor.extract_text_from_image(filename)
+        body += img_processor.extract_text_from_image(filename, autorotate=AUTOROTATION)
         body += "\n-->\n"
+        img = img_processor.encode_image(filename, datatype)
         values = set_json_string(title, NOTEBOOK_ID, body, img)
     else:
         response = create_resource(filename)
@@ -257,10 +267,17 @@ def upload(filename):
     response = requests.post(ENDPOINT + "/notes" + TOKEN, data=values)
     # print(response)
     # print(response.text)
-    if AUTOTAG:
-        apply_tags(body, response.json().get("id"))
-    print(f"Placed note into notebook {NOTEBOOK_ID}: {NOTEBOOK_NAME}")
-    return 0
+    if response.status_code == 200:
+        if AUTOTAG:
+            apply_tags(body, response.json().get("id"))
+        print(f"Placed note into notebook {NOTEBOOK_ID}: {NOTEBOOK_NAME}")
+        if os.path.isdir(MOVETO):
+            shutil.move(filename, MOVETO)
+        return 0
+    else:
+        print("ERROR! NOTE NOT CREATED")
+        print("Something went wrong corrupt file or note > 10MB?")
+        return -1
 
 
 def watcher(path=None):

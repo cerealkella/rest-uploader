@@ -3,6 +3,7 @@
 """Console script for rest_uploader."""
 import sys
 import click
+import tempfile
 from .rest_uploader import (
     watcher,
     set_autotag,
@@ -11,7 +12,8 @@ from .rest_uploader import (
     set_endpoint,
     set_token,
     set_language,
-    set_rotation,
+    set_autorotation,
+    set_moveto,
 )
 from . import __version__
 
@@ -81,11 +83,25 @@ def parse_argument(arg):
 )
 @click.option(
     "-r",
-    "--rotation",
-    "rotation",
-    default="0",
+    "--autorotation",
+    "autorotation",
+    default="yes",
     help="""Specify whether to rotate images."""
-    """ Default = 0 (no rotation). """,
+    """ Default = no (no autorotation). """,
+)
+@click.option(
+    "-m",
+    "--moveto",
+    "moveto",
+    default=tempfile.gettempdir(),
+    type=click.Path(
+        exists=True,
+        file_okay=False,
+        dir_okay=True,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+    )
 )
 @click.version_option(version=__version__)
 def main(
@@ -95,7 +111,8 @@ def main(
     language="eng",
     autotag="yes",
     destination="inbox",
-    rotation=0,
+    autorotation="yes",
+    moveto="",
 ):
     """ Console script for rest_uploader.
         Define file path to monitor, e.g.
@@ -119,11 +136,17 @@ def main(
     set_language(language)
     autotag = parse_argument(autotag)
     set_autotag(parse_argument(autotag))
-    set_rotation(rotation)
+    autorotation = parse_argument(autorotation)
+    set_autorotation(autorotation)
+    moveto = set_moveto(moveto)
     click.echo("Language: " + language)
     click.echo("Automatically Tag Notes? " + autotag)
     click.echo("Destination Notebook: " + destination)
-    click.echo("Rotation: " + rotation)
+    click.echo("Autorotation: " + autorotation)
+    if moveto == "":
+        click.echo("Files will remain in the monitoring directory")
+    else:
+        click.echo("File move to location: " + moveto)
     watcher(path=path)
     return 0
 
