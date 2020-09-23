@@ -3,9 +3,10 @@
 """Main module. Launch by running python -m rest_uploader.cli"""
 
 import os
+import shutil
+import tempfile
 import platform
 import time
-import base64
 import mimetypes
 import json
 import requests
@@ -13,13 +14,7 @@ import csv
 from tabulate import tabulate
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from .img_process import (
-    extract_text_from_image,
-    extract_text_from_pdf,
-    pdf_page_to_image,
-    pdf_valid,
-    TEMP_PATH,
-)
+from img_processor import ImageProcessor
 from .api_token import get_token_suffix
 from pathlib import Path
 
@@ -46,13 +41,14 @@ Uploader only triggered upon new file creation, not modification
 
 class MyHandler(FileSystemEventHandler):
     def _event_handler(self, path):
+        max_retries = 10
         filename, ext = os.path.splitext(path)
         if ext not in (".tmp", ".part", ".crdownload") and ext[:2] not in (".~"):
-            for i in range(10):
+            for i in range(max_retries):
                 filesize = os.path.getsize(path)
-                if filesize < 1 or (ext == ".pdf" and not pdf_valid(path)):
+                if filesize < 1 or not self.valid_file(ext, path):
                     print("Incomplete file. Retrying...")
-                    if i == 9:
+                    if i == max_retries:
                         print("timeout error, invalid file")
                         return False
                     time.sleep(5)
@@ -65,6 +61,13 @@ class MyHandler(FileSystemEventHandler):
         else:
             print("Detected temp file. Temp files are ignored.")
 
+    def valid_file(self, ext, path):
+        if ext == ".pdf":
+            img_processor = ImageProcessor(LANGUAGE)
+            return img_processor.pdf_valid(path)
+        else:
+            return True 
+
     def on_created(self, event):
         print(event.event_type + " -- " + event.src_path)
         self._event_handler(event.src_path)
@@ -74,10 +77,15 @@ class MyHandler(FileSystemEventHandler):
         self._event_handler(event.dest_path)
 
 
-# Set working Directory
 def set_working_directory():
+    """Set working directory"""
     if os.getcwd() != os.chdir(os.path.dirname(os.path.realpath(__file__))):
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
+
+
+def set_language(language):
+    global LANGUAGE
+    LANGUAGE = language
 
 
 def set_token():
@@ -96,6 +104,21 @@ def set_endpoint(server, port):
     global ENDPOINT
     ENDPOINT = f"http://{server}:{port}"
     print(f"Endpoint: {ENDPOINT}")
+
+
+def set_autorotation(autorotation):
+    global AUTOROTATION
+    AUTOROTATION = True
+    if autorotation == "no":
+        AUTOROTATION = False
+
+
+def set_moveto(moveto):
+    global MOVETO
+    if moveto == tempfile.gettempdir():
+        moveto = ""
+    MOVETO = moveto
+    return MOVETO
 
 
 def initialize_notebook(notebook_name):
@@ -187,12 +210,6 @@ def get_resource(resource_id):
     return response
 
 
-def encode_image(filename, datatype):
-    encoded = base64.b64encode(open(filename, "rb").read())
-    img = f"data:{datatype};base64,{encoded.decode()}"
-    return img
-
-
 def set_json_string(title, NOTEBOOK_ID, body, img=None):
     if img is None:
         return '{{ "title": {}, "parent_id": "{}", "body": {} }}'.format(
@@ -224,41 +241,50 @@ def upload(filename):
         body += tabulate(table, headers="keys", numalign="right", tablefmt="pipe")
         values = set_json_string(title, NOTEBOOK_ID, body)
     elif datatype[:5] == "image":
-        img = encode_image(filename, datatype)
+        img_processor = ImageProcessor(LANGUAGE)
         body += "\n<!---\n"
-        body += extract_text_from_image(filename)
+        body += img_processor.extract_text_from_image(filename, autorotate=AUTOROTATION)
         body += "\n-->\n"
+        img = img_processor.encode_image(filename, datatype)
         values = set_json_string(title, NOTEBOOK_ID, body, img)
     else:
         response = create_resource(filename)
         body += f"[{basefile}](:/{response['id']})"
         values = set_json_string(title, NOTEBOOK_ID, body)
         if response["file_extension"] == "pdf":
+            img_processor = ImageProcessor(LANGUAGE)
             # Special handling for PDFs
             body += "\n<!---\n"
-            body += extract_text_from_pdf(filename)
+            body += img_processor.extract_text_from_pdf(filename)
             body += "\n-->\n"
-            previewfile = f"{TEMP_PATH}\preview.png"
+            previewfile = img_processor.PREVIEWFILE
             if not os.path.exists(previewfile):
-                previewfile = pdf_page_to_image(filename)
-            img = encode_image(previewfile, "image/png")
+                previewfile = img_processor.pdf_page_to_image(filename)
+            img = img_processor.encode_image(previewfile, "image/png")
             os.remove(previewfile)
             values = set_json_string(title, NOTEBOOK_ID, body, img)
 
     response = requests.post(ENDPOINT + "/notes" + TOKEN, data=values)
     # print(response)
     # print(response.text)
-    if AUTOTAG:
-        apply_tags(body, response.json().get("id"))
-    print(f"Placed note into notebook {NOTEBOOK_ID}: {NOTEBOOK_NAME}")
-    return 0
+    if response.status_code == 200:
+        if AUTOTAG:
+            apply_tags(body, response.json().get("id"))
+        print(f"Placed note into notebook {NOTEBOOK_ID}: {NOTEBOOK_NAME}")
+        if os.path.isdir(MOVETO):
+            shutil.move(filename, MOVETO)
+        return 0
+    else:
+        print("ERROR! NOTE NOT CREATED")
+        print("Something went wrong corrupt file or note > 10MB?")
+        return -1
 
 
 def watcher(path=None):
     if path is None:
         path = str(Path.home())
     event_handler = MyHandler()
-    print(f"Monitoring directory {path} for files")
+    print(f"Monitoring directory: {path}")
     observer = Observer()
     observer.schedule(event_handler, path=path, recursive=False)
     observer.start()

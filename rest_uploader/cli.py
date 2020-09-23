@@ -3,6 +3,7 @@
 """Console script for rest_uploader."""
 import sys
 import click
+import tempfile
 from .rest_uploader import (
     watcher,
     set_autotag,
@@ -10,8 +11,10 @@ from .rest_uploader import (
     set_working_directory,
     set_endpoint,
     set_token,
+    set_language,
+    set_autorotation,
+    set_moveto,
 )
-from .img_process import set_language, set_temp_path
 from . import __version__
 
 
@@ -78,6 +81,28 @@ def parse_argument(arg):
     """ Specified notebook must exist or program will exit."""
     """ Default = "inbox". """,
 )
+@click.option(
+    "-r",
+    "--autorotation",
+    "autorotation",
+    default="yes",
+    help="""Specify whether to rotate images."""
+    """ Default = no (no autorotation). """,
+)
+@click.option(
+    "-m",
+    "--moveto",
+    "moveto",
+    default=tempfile.gettempdir(),
+    type=click.Path(
+        exists=True,
+        file_okay=False,
+        dir_okay=True,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+    )
+)
 @click.version_option(version=__version__)
 def main(
     path=None,
@@ -86,6 +111,8 @@ def main(
     language="eng",
     autotag="yes",
     destination="inbox",
+    autorotation="yes",
+    moveto="",
 ):
     """ Console script for rest_uploader.
         Define file path to monitor, e.g.
@@ -95,7 +122,7 @@ def main(
     set_working_directory()
     set_endpoint(server, port)
     set_token()
-    set_temp_path()
+    # set_temp_path() # Do I need to do this here?
     notebook_id = set_notebook_id(destination.strip())
     if notebook_id == "err":
         click.echo("Joplin may not be running, please ensure it is open.")
@@ -109,9 +136,17 @@ def main(
     set_language(language)
     autotag = parse_argument(autotag)
     set_autotag(parse_argument(autotag))
+    autorotation = parse_argument(autorotation)
+    set_autorotation(autorotation)
+    moveto = set_moveto(moveto)
     click.echo("Language: " + language)
     click.echo("Automatically Tag Notes? " + autotag)
-    click.echo("Desitnation Notebook: " + destination)
+    click.echo("Destination Notebook: " + destination)
+    click.echo("Autorotation: " + autorotation)
+    if moveto == "":
+        click.echo("Files will remain in the monitoring directory")
+    else:
+        click.echo("File move to location: " + moveto)
     watcher(path=path)
     return 0
 
