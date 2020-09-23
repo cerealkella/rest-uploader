@@ -98,3 +98,12 @@ History
 -------------------
 
 * Fixed minor but annoying typo on a print statement
+
+
+1.11.0 (2020-05-12)
+-------------------
+
+* Refactoring the imaging module out of rest_uploader and into its
+  own img_processor module for reusability
+* Added logic and command line switches (-r, -m) for autorotation and
+  moving/"sweeping" files after uploading. Run rest-uploader --help

@@ -57,3 +57,10 @@ Example:
 It doesn't matter if the options are before or after the path. Path is mandatory, though.
 The following example will upload newly created notes to the Taxes Notebook, and OCR in German:
 ` rest_uploader -d "Taxes" -l ger /path/to/directory `
+
+### Additional Command Line Options added in version 1.11.0
+Added autorotation switch to turn off if this behavior is not wanted. By default, after performing OCR, the application will rotate the image according to how the OCR was able to detect text. Turn this off using the -r command line switch:
+` rest_uploader -r no /path/to/directory `
+
+Added moveto option to specify a directory in which to place processed files. Use the -m option to specify a moveto directory By default this is off but in the background it uses the operating system's temp directory as a placeholder for the option to indicate "off" since the option requires a valid path. Do not attempt to use the OS temp dir as a moveto directory. Example of using the option:
+` rest_uploader /path/to/directory -m /path/to/moveto/directory `

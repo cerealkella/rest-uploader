@@ -87,7 +87,7 @@ def parse_argument(arg):
     "autorotation",
     default="yes",
     help="""Specify whether to rotate images."""
-    """ Default = no (no autorotation). """,
+    """ Default = yes (autorotation on, specify 'no' to disable). """,
 )
 @click.option(
     "-m",
