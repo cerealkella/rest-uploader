@@ -19,6 +19,7 @@ requirements = [
     "pdf2image",
     "PyPDF2",
     "tabulate",
+    "img_processor",
 ]
 
 setup_requirements = []
