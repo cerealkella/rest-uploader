@@ -100,7 +100,7 @@ History
 * Fixed minor but annoying typo on a print statement
 
 
-1.11.0 (2020-05-12)
+1.11.0 (2020-09-23)
 -------------------
 
 * Refactoring the imaging module out of rest_uploader and into its
