@@ -66,16 +66,14 @@ class MyHandler(FileSystemEventHandler):
             print("Detected temp file. Temp files are ignored.")
 
     def valid_file(self, ext, path):
-        if ext == ".pdf":
+        if ext.lower() == ".pdf":
             img_processor = ImageProcessor(LANGUAGE)
             return img_processor.pdf_valid(path)
-        # make it wait when scanning jpegs regardless of size
-        elif ext.lower() == ".jpg":
-            print("building file...")
-            time.sleep(5)
-            return True
+        elif ext.lower() in [".jpg", ".png", ".gif"]:
+            img_processor = ImageProcessor(LANGUAGE)
+            return img_processor.image_valid(path)
         else:
-            return True 
+            return True
 
     def on_created(self, event):
         print(event.event_type + " -- " + event.src_path)
@@ -292,12 +290,11 @@ def upload(filename):
                 print(f"{basefile} exists in moveto dir, not moving!")
             else:
                 try:
-                    time.sleep(2)
+                    # Give it a few seconds to release file lock
+                    time.sleep(3)
                     shutil.move(filename, MOVETO)
                 except IOError:
-                    print("Woah there, gimme a couple seconds to move this")
-                    time.sleep(3)
-                    # shutil.move(filename, MOVETO)
+                    print("Another process still has this file locked!")
         return 0
     else:
         print("ERROR! NOTE NOT CREATED")
