@@ -90,7 +90,7 @@ def parse_argument(arg):
     """ Default = yes (autorotation on, specify 'no' to disable). """,
 )
 @click.option(
-    "-m",
+    "-o",
     "--moveto",
     "moveto",
     default=tempfile.gettempdir(),
