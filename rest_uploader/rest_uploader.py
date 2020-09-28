@@ -56,7 +56,11 @@ class MyHandler(FileSystemEventHandler):
                     print(f"Filesize = {filesize}. Too big for Joplin, skipping upload")
                     break
                 else:
-                    upload(path)
+                    try:
+                        upload(path)
+                    except OSError:
+                        time.sleep(5)
+                        upload(path)
                     return True
         else:
             print("Detected temp file. Temp files are ignored.")
@@ -65,6 +69,11 @@ class MyHandler(FileSystemEventHandler):
         if ext == ".pdf":
             img_processor = ImageProcessor(LANGUAGE)
             return img_processor.pdf_valid(path)
+        # make it wait when scanning jpegs regardless of size
+        elif ext.lower() == ".jpg":
+            print("building file...")
+            time.sleep(5)
+            return True
         else:
             return True 
 
@@ -243,9 +252,14 @@ def upload(filename):
     elif datatype[:5] == "image":
         img_processor = ImageProcessor(LANGUAGE)
         body += "\n<!---\n"
-        body += img_processor.extract_text_from_image(filename, autorotate=AUTOROTATION)
+        try:
+            body += img_processor.extract_text_from_image(filename, autorotate=AUTOROTATION)
+        except OSError:
+            print("File incomplete, skipping")
+            return -1
         body += "\n-->\n"
         img = img_processor.encode_image(filename, datatype)
+        del img_processor
         values = set_json_string(title, NOTEBOOK_ID, body, img)
     else:
         response = create_resource(filename)
@@ -272,7 +286,18 @@ def upload(filename):
             apply_tags(body, response.json().get("id"))
         print(f"Placed note into notebook {NOTEBOOK_ID}: {NOTEBOOK_NAME}")
         if os.path.isdir(MOVETO):
-            shutil.move(filename, MOVETO)
+            moveto_filename = os.path.join(MOVETO, basefile)
+            print(moveto_filename)
+            if os.path.exists(moveto_filename):
+                print(f"{basefile} exists in moveto dir, not moving!")
+            else:
+                try:
+                    time.sleep(2)
+                    shutil.move(filename, MOVETO)
+                except IOError:
+                    print("Woah there, gimme a couple seconds to move this")
+                    time.sleep(3)
+                    # shutil.move(filename, MOVETO)
         return 0
     else:
         print("ERROR! NOTE NOT CREATED")
