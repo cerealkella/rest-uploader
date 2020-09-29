@@ -41,44 +41,34 @@ Uploader only triggered upon new file creation, not modification
 
 class MyHandler(FileSystemEventHandler):
     def _event_handler(self, path):
-        max_retries = 10
         filename, ext = os.path.splitext(path)
         if ext not in (".tmp", ".part", ".crdownload") and ext[:2] not in (".~"):
-            for i in range(max_retries):
-                filesize = os.path.getsize(path)
-                if filesize < 1 or not self.valid_file(ext, path):
-                    print("Incomplete file. Retrying...")
-                    if i == max_retries:
-                        print("timeout error, invalid file")
-                        return False
-                    time.sleep(5)
-                elif filesize > 10000000:
-                    print(f"Filesize = {filesize}. Too big for Joplin, skipping upload")
-                    break
-                else:
-                    try:
-                        upload(path)
-                    except OSError:
-                        time.sleep(5)
-                        upload(path)
-                    return True
+            filesize = self.valid_file(ext, path)
+            if filesize > 10000000:
+                print(f"Filesize = {filesize}. Too big for Joplin, skipping upload")
+                return False
+            else:
+                try:
+                    upload(path)
+                except OSError:
+                    print(f"OS Error: Skipping File {path}")
+                return True                    
         else:
             print("Detected temp file. Temp files are ignored.")
 
     def valid_file(self, ext, path):
+        """Ensure file is completely written before processing"""
         size_past = -1
         while True:
             size_now = os.path.getsize(path)
             if size_now == size_past:
-                print(f"File copied. Size={size_now}")
-                return True
+                print(f"File xfer complete. Size={size_now}")
+                return size_now
             else:
                 size_past = os.path.getsize(path)
-                print("File copying...")
+                print("File transferring...")
                 time.sleep(1)
-        if ext.lower() == ".pdf":
-            img_processor = ImageProcessor(LANGUAGE)
-            return img_processor.pdf_valid(path)
+        return -1
 
     def on_created(self, event):
         print(event.event_type + " -- " + event.src_path)
@@ -269,18 +259,19 @@ def upload(filename):
         response = create_resource(filename)
         body += f"[{basefile}](:/{response['id']})"
         values = set_json_string(title, NOTEBOOK_ID, body)
-        if response["file_extension"] == "pdf":
+        if response["file_extension"] == "pdf":      
             img_processor = ImageProcessor(LANGUAGE)
-            # Special handling for PDFs
-            body += "\n<!---\n"
-            body += img_processor.extract_text_from_pdf(filename)
-            body += "\n-->\n"
-            previewfile = img_processor.PREVIEWFILE
-            if not os.path.exists(previewfile):
-                previewfile = img_processor.pdf_page_to_image(filename)
-            img = img_processor.encode_image(previewfile, "image/png")
-            os.remove(previewfile)
-            values = set_json_string(title, NOTEBOOK_ID, body, img)
+            if img_processor.pdf_valid(filename):
+                # Special handling for PDFs
+                body += "\n<!---\n"
+                body += img_processor.extract_text_from_pdf(filename)
+                body += "\n-->\n"
+                previewfile = img_processor.PREVIEWFILE
+                if not os.path.exists(previewfile):
+                    previewfile = img_processor.pdf_page_to_image(filename)
+                img = img_processor.encode_image(previewfile, "image/png")
+                os.remove(previewfile)
+                values = set_json_string(title, NOTEBOOK_ID, body, img)
 
     response = requests.post(ENDPOINT + "/notes" + TOKEN, data=values)
     # print(response)
