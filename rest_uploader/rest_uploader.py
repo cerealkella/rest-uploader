@@ -66,7 +66,7 @@ class MyHandler(FileSystemEventHandler):
                 return size_now
             else:
                 size_past = os.path.getsize(path)
-                print("File transferring...")
+                print(f"File transferring...{size_now}")
                 time.sleep(1)
         return -1
 
