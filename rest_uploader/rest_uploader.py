@@ -66,14 +66,19 @@ class MyHandler(FileSystemEventHandler):
             print("Detected temp file. Temp files are ignored.")
 
     def valid_file(self, ext, path):
+        size_past = -1
+        while True:
+            size_now = os.path.getsize(path)
+            if size_now == size_past:
+                print(f"File copied. Size={size_now}")
+                return True
+            else:
+                size_past = os.path.getsize(path)
+                print("File copying...")
+                time.sleep(1)
         if ext.lower() == ".pdf":
             img_processor = ImageProcessor(LANGUAGE)
             return img_processor.pdf_valid(path)
-        elif ext.lower() in [".jpg", ".png", ".gif"]:
-            img_processor = ImageProcessor(LANGUAGE)
-            return img_processor.image_valid(path)
-        else:
-            return True
 
     def on_created(self, event):
         print(event.event_type + " -- " + event.src_path)
@@ -253,6 +258,7 @@ def upload(filename):
         try:
             body += img_processor.extract_text_from_image(filename, autorotate=AUTOROTATION)
         except OSError:
+            time.sleep(5)
             print("File incomplete, skipping")
             return -1
         body += "\n-->\n"
