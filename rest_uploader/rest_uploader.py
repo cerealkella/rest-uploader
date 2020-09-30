@@ -48,11 +48,17 @@ class MyHandler(FileSystemEventHandler):
                 print(f"Filesize = {filesize}. Too big for Joplin, skipping upload")
                 return False
             else:
-                try:
-                    upload(path)
-                except OSError:
-                    print(f"OS Error: Skipping File {path}")
-                return True                    
+                i = 1
+                max_retries = 5
+                while i <= max_retries:
+                    if i > 1:
+                        print(f"Retrying file upload {i} of {max_retries}...")
+                    if upload(path) < 0:
+                        time.sleep(5)
+                    else:
+                        return True
+                print(f"Tried {max_retries} times but failed to upload file {path}")
+                return False
         else:
             print("Detected temp file. Temp files are ignored.")
 
@@ -247,9 +253,10 @@ def upload(filename):
         body += "\n<!---\n"
         try:
             body += img_processor.extract_text_from_image(filename, autorotate=AUTOROTATION)
+        except TypeError:
+            print("Unable to perform OCR on this file.")
         except OSError:
-            time.sleep(5)
-            print("File incomplete, skipping")
+            print(f"Invalid or incomplete file - {filename}")
             return -1
         body += "\n-->\n"
         img = img_processor.encode_image(filename, datatype)
@@ -291,7 +298,7 @@ def upload(filename):
                     time.sleep(3)
                     shutil.move(filename, MOVETO)
                 except IOError:
-                    print("Another process still has this file locked!")
+                    print(f"File Locked-unable to move {filename}")
         return 0
     else:
         print("ERROR! NOTE NOT CREATED")
