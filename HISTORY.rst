@@ -107,3 +107,11 @@ History
   own img_processor module for reusability
 * Added logic and command line switches (-r, -m) for autorotation and
   moving/"sweeping" files after uploading. Run rest-uploader --help
+
+
+1.13.0 (2020-12-11)
+-------------------
+
+* Fixed breaking changes from Joplin API in version 1.4.19
+* rest_uploader as of version 1.13.0 will not work with versions
+  of Joplin prior to 1.4.19
