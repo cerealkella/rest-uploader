@@ -109,6 +109,12 @@ History
   moving/"sweeping" files after uploading. Run rest-uploader --help
 
 
+1.12.0 (2020-10-08)
+-------------------
+
+* Added additional error handling and better output
+
+
 1.13.0 (2020-12-11)
 -------------------
 
