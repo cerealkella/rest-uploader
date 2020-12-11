@@ -148,7 +148,7 @@ def set_notebook_id(notebook_name=None):
         NOTEBOOK_NAME = initialize_notebook(notebook_name)
     try:
         res = requests.get(ENDPOINT + "/folders" + TOKEN)
-        folders = res.json()
+        folders = res.json()["items"]
         for folder in folders:
             if folder.get("title") == NOTEBOOK_NAME:
                 NOTEBOOK_ID = folder.get("id")
@@ -178,7 +178,7 @@ def read_csv(filename):
 def apply_tags(text_to_match, note_id):
     """ Rudimentary Tag match using OCR'd text """
     res = requests.get(ENDPOINT + "/tags" + TOKEN)
-    tags = res.json()
+    tags = res.json()["items"]
     counter = 0
     for tag in tags:
         if tag.get("title").lower() in text_to_match.lower():
@@ -202,7 +202,6 @@ def create_resource(filename):
         "props": (None, f'{{"title":"{title}", "filename":"{basefile}"}}'),
     }
     response = requests.post(ENDPOINT + "/resources" + TOKEN, files=files)
-    print(response.json())
     return response.json()
 
 
