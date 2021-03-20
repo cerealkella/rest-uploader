@@ -6,7 +6,6 @@ REST API File Uploader for Joplin
 Joplin client will need Webclipper service enabled.
 * Go to Tools -> Web Clipper Options -> Enable Web Clipper Service
 
-
 ### Tesseract
 In order for OCR text recognition to work, you'll need to download and
 install Tesseract. Windows systems may require that you add a path variable
@@ -16,7 +15,6 @@ in order for it to work.
 Poppler is required for PDF processing.
 For Windows, download x86 binary and add to environment path.
 https://blog.alivate.com.au/poppler-windows/
-
 
 ### Running application
 Launch using the executable rest_uploader, specify the monitoring path
