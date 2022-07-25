@@ -1,6 +1,6 @@
 [project]
 name = "rest_uploader"
-version = "1.13.0"
+version = "1.14.0"
 authors = [
   { name="Justin Keller", email="kellerjustin@protonmail.com" },
 ]
