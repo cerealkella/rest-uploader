@@ -121,3 +121,9 @@ History
 * Fixed breaking changes from Joplin API in version 1.4.19
 * rest_uploader as of version 1.13.0 will not work with versions
   of Joplin prior to 1.4.19
+
+
+1.14.0 (2022-07-25)
+-------------------
+
+* Moves Joplin API file to userspace
