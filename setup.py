@@ -4,12 +4,10 @@
 """The setup script."""
 
 from setuptools import setup, find_packages
+from pathlib import Path
 
-with open("README.rst") as readme_file:
-    readme = readme_file.read()
-
-with open("HISTORY.rst") as history_file:
-    history = history_file.read()
+# read the contents of your README file
+long_description = (Path(__file__).parent / "README.md").read_text()
 
 requirements = [
     "Click>=6.0",
@@ -46,7 +44,8 @@ setup(
     entry_points={"console_scripts": ["rest_uploader=rest_uploader.cli:main"]},
     install_requires=requirements,
     license="MIT license",
-    long_description=readme + "\n\n" + history,
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     include_package_data=True,
     keywords=["rest_uploader", "joplin", "rest-uploader"],
     name="rest_uploader",
