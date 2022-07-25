@@ -1,0 +1,19 @@
+[project]
+name = "rest_uploader"
+version = "1.13.0"
+authors = [
+  { name="Justin Keller", email="kellerjustin@protonmail.com" },
+]
+description = "REST API File Uploader for Joplin"
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/cerealkella/rest-uploader"
+"Bug Tracker" = "https://github.com/cerealkella/rest-uploader/issues"

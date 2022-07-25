@@ -4,5 +4,6 @@
     "python.linting.flake8Enabled": true,
     "python.linting.enabled": true,
     "restructuredtext.confPath": "${workspaceFolder}/docs",
-    "esbonio.sphinx.confDir": "${workspaceFolder}/docs"
+    "esbonio.sphinx.confDir": "${workspaceFolder}/docs",
+    "restructuredtext.preview.name": "sphinx"
 }
