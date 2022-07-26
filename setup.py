@@ -6,10 +6,10 @@
 from setuptools import setup, find_packages
 from pathlib import Path
 
-# read the contents of your README file
+# Build the long description using README & HISTORY
 readme = (Path(__file__).parent / "README.md").read_text()
 history = (Path(__file__).parent / "HISTORY.md").read_text()
-long_description = readme = history
+long_description = readme + history
 
 requirements = [
     "Click>=6.0",
