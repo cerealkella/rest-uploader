@@ -102,7 +102,11 @@
 * Moves Joplin API file to userspace
 
 
-1.15.0 (2022-07-25)
--------------------
+## 1.15.0 - 2022-07-25
 
 * Fixes documentation problems
+
+
+## 1.16.0 - 2022-07-25
+
+* Removed a couple redundant files
