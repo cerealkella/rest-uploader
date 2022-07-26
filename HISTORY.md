@@ -109,4 +109,9 @@
 
 ## 1.16.0 - 2022-07-25
 
+* More fixes to documentation.
+
+
+## 1.17.0 - 2022-07-25
+
 * Removed a couple redundant files
