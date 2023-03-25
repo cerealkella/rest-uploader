@@ -15,11 +15,8 @@ requirements = [
     "Click>=6.0",
     "watchdog",
     "requests",
-    "pytesseract",
-    "pdf2image",
-    "PyPDF2",
     "tabulate",
-    "img_processor",
+    "img_processor>=0.19.0",
 ]
 
 setup_requirements = []
