@@ -12,7 +12,7 @@ import json
 import requests
 import csv
 from tabulate import tabulate
-from watchdog.observers import Observer
+from watchdog.observers.polling import PollingObserver
 from watchdog.events import FileSystemEventHandler
 from img_processor import ImageProcessor
 from .api_token import get_token_suffix
@@ -138,7 +138,7 @@ def initialize_notebook(notebook_name):
 
 
 def set_notebook_id(notebook_name=None):
-    """ Find the ID of the destination folder 
+    """Find the ID of the destination folder
     adapted logic from jhf2442 on Joplin forum
     https://discourse.joplin.cozic.net/t/import-txt-files/692
     """
@@ -176,7 +176,7 @@ def read_csv(filename):
 
 
 def apply_tags(text_to_match, note_id):
-    """ Rudimentary Tag match using OCR'd text """
+    """Rudimentary Tag match using OCR'd text"""
     res = requests.get(ENDPOINT + "/tags" + TOKEN)
     tags = res.json()["items"]
     counter = 0
@@ -229,7 +229,7 @@ def set_json_string(title, NOTEBOOK_ID, body, img=None):
 
 
 def upload(filename):
-    """ Get the default Notebook ID and process the passed in file"""
+    """Get the default Notebook ID and process the passed in file"""
     basefile = os.path.basename(filename)
     title, ext = os.path.splitext(basefile)
     body = f"{basefile} uploaded from {platform.node()}\n"
@@ -251,7 +251,9 @@ def upload(filename):
         img_processor = ImageProcessor(LANGUAGE)
         body += "\n<!---\n"
         try:
-            body += img_processor.extract_text_from_image(filename, autorotate=AUTOROTATION)
+            body += img_processor.extract_text_from_image(
+                filename, autorotate=AUTOROTATION
+            )
         except TypeError:
             print("Unable to perform OCR on this file.")
         except OSError:
@@ -265,7 +267,7 @@ def upload(filename):
         response = create_resource(filename)
         body += f"[{basefile}](:/{response['id']})"
         values = set_json_string(title, NOTEBOOK_ID, body)
-        if response["file_extension"] == "pdf":      
+        if response["file_extension"] == "pdf":
             img_processor = ImageProcessor(LANGUAGE)
             if img_processor.pdf_valid(filename):
                 # Special handling for PDFs
@@ -309,8 +311,9 @@ def watcher(path=None):
     if path is None:
         path = str(Path.home())
     event_handler = MyHandler()
+    print("POLLING OBSERVER!")
     print(f"Monitoring directory: {path}")
-    observer = Observer()
+    observer = PollingObserver()
     observer.schedule(event_handler, path=path, recursive=False)
     observer.start()
 
