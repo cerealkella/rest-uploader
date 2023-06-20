@@ -12,14 +12,11 @@ history = (Path(__file__).parent / "HISTORY.md").read_text()
 long_description = readme + history
 
 requirements = [
-    "Click>=6.0",
-    "watchdog",
-    "requests",
-    "pytesseract",
-    "pdf2image",
-    "PyPDF2",
-    "tabulate",
-    "img_processor",
+    "watchdog>=3.0.0",
+    "requests>=2.31.0",
+    "tabulate>=0.9.0",
+    "click>=8.1.3",
+    "img_processor>=0.20.0",
 ]
 
 setup_requirements = []
