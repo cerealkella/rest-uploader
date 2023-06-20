@@ -14,7 +14,7 @@ in order for it to work.
 ### Poppler
 Poppler is required for PDF processing.
 For Windows, download x86 binary and add to environment path.
-https://blog.alivate.com.au/poppler-windows/
+https://anaconda.org/conda-forge/poppler
 
 ### Running application
 Launch using the executable rest_uploader, specify the monitoring path
