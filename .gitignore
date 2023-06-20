@@ -108,3 +108,6 @@ venv.bak/
 
 # direnv 
 .direnv/
+
+# email_processing
+rest_uploader/creds.toml
