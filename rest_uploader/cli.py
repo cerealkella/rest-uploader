@@ -101,7 +101,7 @@ def parse_argument(arg):
         writable=False,
         readable=True,
         resolve_path=True,
-    )
+    ),
 )
 @click.version_option(version=__version__)
 def main(
@@ -114,9 +114,9 @@ def main(
     autorotation="yes",
     moveto="",
 ):
-    """ Console script for rest_uploader.
-        Define file path to monitor, e.g.
-        rest_uploader /home/user/Docouments/scans    
+    """Console script for rest_uploader.
+    Define file path to monitor, e.g.
+    rest_uploader /home/user/Docouments/scans
     """
     click.echo("Launching Application " "rest_uploader.cli.main")
     set_working_directory()

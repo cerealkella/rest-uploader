@@ -48,9 +48,9 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"rest_uploader"
-copyright = u"2019, Justin Keller"
-author = u"Justin Keller"
+project = "rest_uploader"
+copyright = "2019, Justin Keller"
+author = "Justin Keller"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -129,8 +129,8 @@ latex_documents = [
     (
         master_doc,
         "rest_uploader.tex",
-        u"rest_uploader Documentation",
-        u"Justin Keller",
+        "rest_uploader Documentation",
+        "Justin Keller",
         "manual",
     )
 ]
@@ -140,7 +140,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "rest_uploader", u"rest_uploader Documentation", [author], 1)]
+man_pages = [(master_doc, "rest_uploader", "rest_uploader Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------
@@ -152,7 +152,7 @@ texinfo_documents = [
     (
         master_doc,
         "rest_uploader",
-        u"rest_uploader Documentation",
+        "rest_uploader Documentation",
         author,
         "rest_uploader",
         "One line description of project.",
