@@ -6,6 +6,25 @@ REST API File Uploader for Joplin
 Joplin client will need Webclipper service enabled.
 * Go to Tools -> Web Clipper Options -> Enable Web Clipper Service
 
+### History
+2018-09-24
+This program was created to upload files from a folder specified in the
+PATH variable to Joplin. The following resource was helpful in figuring out
+the logic for Watchdog:
+https://stackoverflow.com/questions/18599339/python-watchdog-monitoring-file-for-changes
+
+Tested with the following extensions:
+.md
+.txt
+.pdf
+.png
+.jpg
+.url
+.csv
+
+Caveat:
+Uploader only triggered upon new file creation, not modification
+
 ### Tesseract
 In order for OCR text recognition to work, you'll need to download and
 install Tesseract. Windows systems may require that you add a path variable
