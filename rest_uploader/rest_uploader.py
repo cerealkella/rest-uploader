@@ -20,25 +20,6 @@ from watchdog.observers.polling import PollingObserver
 
 from .api_token import get_token_suffix
 
-"""
-2018-09-24 JRK
-This program was created to upload files from a folder specified in the
-PATH variable to Joplin. The following resource was helpful in figuring out
-the logic for Watchdog:
-https://stackoverflow.com/questions/18599339/python-watchdog-monitoring-file-for-changes
-
-Tested with the following extensions:
-.md
-.txt
-.pdf
-.png
-.jpg
-.url
-
-Caveat
-Uploader only triggered upon new file creation, not modification
-"""
-
 
 class MyHandler(FileSystemEventHandler):
     def _event_handler(self, path):
@@ -160,9 +141,9 @@ def set_notebook_id(notebook_name=None):
                         if child.get("title") == NOTEBOOK_NAME:
                             NOTEBOOK_ID = child.get("id")
         return NOTEBOOK_ID
-    except requests.ConnectionError as e:
+    except requests.ConnectionError as exception:
         print("Connection Error - Is Joplin Running?")
-        return "err"
+        return exception
 
 
 def read_text_note(filename):
@@ -185,7 +166,7 @@ def apply_tags(text_to_match, note_id):
         if tag.get("title").lower() in text_to_match.lower():
             counter += 1
             tag_id = tag.get("id")
-            response = requests.post(
+            requests.post(
                 ENDPOINT + f"/tags/{tag_id}/notes" + TOKEN,
                 data=f'{{"id": "{note_id}"}}',
             )
