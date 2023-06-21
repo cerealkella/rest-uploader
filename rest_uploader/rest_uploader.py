@@ -2,22 +2,23 @@
 
 """Main module. Launch by running python -m rest_uploader.cli"""
 
+import csv
+import json
+import mimetypes
 import os
+import platform
 import shutil
 import tempfile
-import platform
 import time
-import mimetypes
-import json
-import requests
-import csv
-from tabulate import tabulate
-from watchdog.observers.polling import PollingObserver
-from watchdog.events import FileSystemEventHandler
-from img_processor import ImageProcessor
-from .api_token import get_token_suffix
 from pathlib import Path
 
+import requests
+from img_processor import ImageProcessor
+from tabulate import tabulate
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers.polling import PollingObserver
+
+from .api_token import get_token_suffix
 
 """
 2018-09-24 JRK
