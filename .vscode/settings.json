@@ -1,9 +1,18 @@
 {
-    "python.pythonPath": "/home/justin/.virtualenvs/rest_uploader_dev/bin/python",
-    "python.linting.pylintEnabled": false,
-    "python.linting.flake8Enabled": true,
     "python.linting.enabled": true,
-    "restructuredtext.confPath": "${workspaceFolder}/docs",
-    "esbonio.sphinx.confDir": "${workspaceFolder}/docs",
-    "restructuredtext.preview.name": "sphinx"
+    "python.linting.pylintEnabled": false,
+    "python.linting.pycodestyleEnabled": false,
+    "python.linting.prospectorEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": [
+        "--line-length",
+        "120"
+    ],
+    
+    "python.linting.flake8Args": [
+        "--max-line-length=120",
+        "--ignore=E402",
+        "--ignore=W503"
+    ]
 }
