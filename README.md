@@ -1,7 +1,7 @@
 # rest-uploader
 REST API File Uploader for Joplin
 
-[API Reference](https://joplin.cozic.net/api/)
+[API Reference](https://joplinapp.org/api/references/rest_api/)
 
 Joplin client will need Webclipper service enabled.
 * Go to Tools -> Web Clipper Options -> Enable Web Clipper Service
