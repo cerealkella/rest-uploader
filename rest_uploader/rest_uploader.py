@@ -249,7 +249,7 @@ def upload(filename):
         response = create_resource(filename)
         body += f"[{basefile}](:/{response['id']})"
         values = set_json_string(title, NOTEBOOK_ID, body)
-        if response["file_extension"] == "pdf":
+        if response["file_extension"].lower() == "pdf":
             img_processor = ImageProcessor(LANGUAGE)
             if img_processor.pdf_valid(filename):
                 # Special handling for PDFs
