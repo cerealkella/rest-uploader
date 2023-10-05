@@ -115,3 +115,7 @@
 ## 1.17.0 - 2022-07-25
 
 * Removed a couple redundant files
+
+## 1.20.0 - 2023-10-05
+
+* Enabled PDF processing of .PDF (uppercase) extensions
