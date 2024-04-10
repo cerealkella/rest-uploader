@@ -222,10 +222,12 @@ def upload(filename):
             datatype = "text/plain"
         else:
             datatype = ""
-    if datatype == "text/plain":
+    elif datatype in ("text/plain", "text/html"):
         body += read_text_note(filename)
         values = set_json_string(title, NOTEBOOK_ID, body)
-    if datatype == "text/csv":
+        if datatype == "text/html":
+            values = values.replace('"body":', '"markup_language": 2, "body":')
+    elif datatype == "text/csv":
         table = read_csv(filename)
         body += tabulate(table, headers="keys", numalign="right", tablefmt="pipe")
         values = set_json_string(title, NOTEBOOK_ID, body)
@@ -262,10 +264,7 @@ def upload(filename):
                 img = img_processor.encode_image(previewfile, "image/png")
                 os.remove(previewfile)
                 values = set_json_string(title, NOTEBOOK_ID, body, img)
-
     response = requests.post(ENDPOINT + "/notes" + TOKEN, data=values)
-    # print(response)
-    # print(response.text)
     if response.status_code == 200:
         if AUTOTAG:
             apply_tags(body, response.json().get("id"))
