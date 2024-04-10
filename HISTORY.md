@@ -119,3 +119,8 @@
 ## 1.20.0 - 2023-10-05
 
 * Enabled PDF processing of .PDF (uppercase) extensions
+
+
+## 1.21.0 - 2024-04-10
+
+* Enabled improved handling of HTML files
