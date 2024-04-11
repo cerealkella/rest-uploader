@@ -124,3 +124,7 @@
 ## 1.21.0 - 2024-04-10
 
 * Enabled improved handling of HTML files
+
+## 1.22.0 - 2024-04-11
+
+* Adds a function to check for duplicate resources
