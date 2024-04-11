@@ -35,7 +35,7 @@ class MyHandler(FileSystemEventHandler):
                 while i <= max_retries:
                     if i > 1:
                         print(f"Retrying file upload {i} of {max_retries}...")
-                    if upload(path) < 0:
+                    if upload(path, filesize) < 0:
                         time.sleep(5)
                     else:
                         return True
@@ -174,6 +174,20 @@ def apply_tags(text_to_match, note_id):
     return counter
 
 
+def check_for_duplicates(filename, filesize):
+    http_notes_request = f"""{ENDPOINT}/search?query="{filename}"{TOKEN.replace("?", "&")}"""
+    notes = requests.get(http_notes_request).json()["items"]
+    notify = ""
+    for note in notes:
+        http_resources_request = f"""{ENDPOINT}/notes/{note["id"]}/resources?fields=id,title,size{TOKEN.replace("?", "&")}"""
+        resources = requests.get(http_resources_request).json()["items"]
+        for resource in resources:
+            if filesize == int(resource["size"]):
+                notify += f"""## Found identical resource: [{note["title"]}](:/{note["id"]})\n"""
+                print(notify)
+    return notify
+
+
 def create_resource(filename):
     if NOTEBOOK_ID == "":
         set_notebook_id()
@@ -210,11 +224,12 @@ def set_json_string(title, NOTEBOOK_ID, body, img=None):
         )
 
 
-def upload(filename):
+def upload(filename, filesize):
     """Get the default Notebook ID and process the passed in file"""
     basefile = os.path.basename(filename)
     title, ext = os.path.splitext(basefile)
     body = f"{basefile} uploaded from {platform.node()}\n"
+    body += check_for_duplicates(title, filesize)
     datatype = mimetypes.guess_type(filename)[0]
     if datatype is None:
         # avoid subscript exception if datatype is None
