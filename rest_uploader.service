@@ -1,0 +1,18 @@
+# For Arch/Manjaro Systems, place this file here: $HOME/.config/systemd/user/rest_uploader.Service
+# Adjust accordingly for other systems, but this service works great as a user service
+# to start: systemctl --user start rest_uploader.service
+# to enable: systemctl --user enable rest_uploader.service
+[Service]
+Description=rest-uploader script for Joplin
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h
+ExecStart=/home/yourusername/.virtualenvs/rest_uploader/bin/python -m rest_uploader.cli -d inbox /home/yourusername/joplin_upload --moveto /home/yourusername/joplin_upload/archive
+CPUSchedulingPolicy=idle
+IOSchedulingClass=3
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
