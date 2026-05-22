@@ -15,6 +15,7 @@ from pathlib import Path
 import requests
 from img_processor import ImageProcessor
 from tabulate import tabulate
+from urllib.parse import quote_plus
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
 
@@ -175,7 +176,7 @@ def apply_tags(text_to_match, note_id):
 
 
 def check_for_duplicates(filename, filesize):
-    http_notes_request = f"""{ENDPOINT}/search?query="{filename}"{TOKEN.replace("?", "&")}"""
+    http_notes_request = f"""{ENDPOINT}/search?query="{quote_plus(filename)}"{TOKEN.replace("?", "&")}"""
     notes = requests.get(http_notes_request).json()["items"]
     notify = ""
     for note in notes:
